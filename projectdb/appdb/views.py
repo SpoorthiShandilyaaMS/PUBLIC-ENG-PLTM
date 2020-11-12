@@ -62,6 +62,7 @@ def get_signup_data(request):
                                'constituency_name': constituency
                             }
                         }
+                        return JsonResponse(responseData)
                     else:
                         # send HttpResponse
                         responseData = {
@@ -568,35 +569,35 @@ def add_answer(request):
 
 
 
-# @csrf_exempt
-# def get_all_query_answers(request):
-#     if request.method == 'GET':
-#         constid=request.GET.get('const_id')
-#         if(constid):
-#             try:
-#                 queryData = Query.objects.filter(qconst_id=constid).values('id','query','posted_by_name','qconst_id','qconst_name','answered_by')
-#                 queryData = list(queryData)
-#
-#                 for query in queryData:
-#                     return HttpResponse(query.id)
-#                 return HttpResponse(len(queryData))
-#                     # answerData = Answer.objects.order_by('id').values('id','answer','answered_by_name','query_id','date')
-#                 responseData ={
-#                     'code' : 200,
-#                     'msg' : 'successfully queries shown',
-#                     'data' : list(answerData),
-#                     }
-#                 return JsonResponse(responseData, safe=False)
-#             except Exception as e:
-#                 responseData = {
-#                     'code': 500,
-#                     'message': 'Something went wrong!!'+str(e),
-#                 }
-#                 return JsonResponse(responseData, safe=False)
-#
-#         else:
-#             responseData ={
-#             'code' : 400,
-#             'msg' : 'Specify query ID'
-#             }
-#             return JsonResponse(responseData, safe=False)
+@csrf_exempt
+def get_all_query_answers(request):
+    if request.method == 'GET':
+        constid=request.GET.get('const_id')
+        if(constid):
+            try:
+                queryData = Query.objects.filter(qconst_id=constid).values('id','query','posted_by_name','qconst_id','qconst_name','answered_by')
+                queryData = list(queryData)
+
+                for query in queryData:
+                    return HttpResponse(query.id)
+                return HttpResponse(len(queryData))
+                    # answerData = Answer.objects.order_by('id').values('id','answer','answered_by_name','query_id','date')
+                responseData ={
+                    'code' : 200,
+                    'msg' : 'successfully queries shown',
+                    'data' : list(answerData),
+                    }
+                return JsonResponse(responseData, safe=False)
+            except Exception as e:
+                responseData = {
+                    'code': 500,
+                    'message': 'Something went wrong!!'+str(e),
+                }
+                return JsonResponse(responseData, safe=False)
+
+        else:
+            responseData ={
+            'code' : 400,
+            'msg' : 'Specify query ID'
+            }
+            return JsonResponse(responseData, safe=False)
