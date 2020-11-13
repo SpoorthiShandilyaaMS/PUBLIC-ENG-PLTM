@@ -149,6 +149,10 @@ def login(request):
     else:
         return render(request,'appdb/login.html')
 
+@csrf_exempt
+def dashboard(request):
+    if request.method =='GET':
+        return render(request,'appdb/dashboard.html')
 
 
 @csrf_exempt
