@@ -32,6 +32,7 @@ urlpatterns = [
     path('getallqueries',views.get_all_queries,name='getallqueries'),
     path('upvote',views.upvote,name='upvote'),
     path('addanswer',views.add_answer,name='addanswer'),
-    path('getallqueryanswers',views.get_all_query_answers,name='getallqueryanswers')
+    path('getallqueryanswers',views.get_all_query_answers,name='getallqueryanswers'),
+    path('dashboard',views.dashboard,name='dashboard')
 
 ]
