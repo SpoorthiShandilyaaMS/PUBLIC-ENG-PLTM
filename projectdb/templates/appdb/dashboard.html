@@ -1,28 +1,103 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link href='https://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
+    <style>
+        .header {
 
-    <body>
+            padding: 10px 16px;
+            background: #37474F;
+            color: #0e0b0b;
 
-    </body>
+        }
 
-</html>
+        .sticky {
+
+            position: fixed;
+            top: 0;
+            width: 100%;
+
+        }
+
+        .sticky+.content {
+            padding-top: 102px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="viewport">
+        {% include "appdb/navbar.html" %}
+        <!-- Content -->
+        <div id="content">
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="card well card-body bg-light header" id="myHeader" style="background-color:#5d7370;">
+                        <p class ='title'><b></p>NEWS FEED</b></p>
+                    </div>
+                    <div class="content" id="feeds"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</body>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <script>
-    console.log(sessionStorage.getItem("status"))
-    console.log(sessionStorage.getItem("uemail"))
-    console.log(sessionStorage.getItem("username"))
-    console.log(sessionStorage.getItem("const_id"))
-    console.log(sessionStorage.getItem("usertype"))
-    $(document).ready(function() {
-        function sessioncheck() {
-            if (!sessionStorage.getItem("status")) window.location = '/login';
+    //on ready function for dashboard
+    $(document).ready(function () {
+        //to show corresponding nav bar
+        $('.representative-sidebar').hide();
+        $('.public-sidebar').hide();
+        $('.admin-sidebar').hide();
+        if (sessionStorage.getItem("usertype") == 'admin') $('.admin-sidebar').show();
+        else if (sessionStorage.getItem("usertype") == 'public') $('.public-sidebar').show();
+        else if (sessionStorage.getItem("usertype") == 'representative') $('.representative-sidebar').show();
+
+        if ($('.main-panel > .content').length == 0) {
+            $('.main-panel').css('height', '100%');
         }
         sessioncheck();
+        getAllFeeds(sessionStorage.getItem("const_id"));
+
     });
+
+    function getAllFeeds(const_id) {
+
+        $.ajax({
+            url: "/getAllFeeds?const_id=" + const_id,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'GET',
+            beforeSend: function () { },
+            success: function (response) {
+                console.log(response);
+                var data = '';
+                for (var i = 0; i < response.data.length; i++) {
+                    data += '<div><small><b>' + response.data[i].feed_date + '</b></small><hr><large><b>' + response.data[i].feed_title + '</b></large><p><br><small>' + response.data[i].feed_description + '</small></p><hr><hr> </div>';
+                }
+
+                $('#feeds').html(data);
+                window.scrollBy(100, 0);
+            },
+            error: function (error) {
+            }
+        })
+    }
+    window.onscroll = function () { myFunction() };
+
+    var header = document.getElementById("myHeader");
+    var sticky = header.offsetTop;
+
+    function myFunction() {
+        if (window.pageYOffset > sticky) {
+            header.classList.add("sticky");
+        } else {
+            header.classList.remove("sticky");
+        }
+    }
 </script>
+
+</html>

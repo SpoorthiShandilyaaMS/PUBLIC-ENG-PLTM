@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
     <link href='https://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <style media="screen">
+
+
         *,
         *:before,
         *:after {
@@ -13,13 +16,29 @@
             -webkit-box-sizing: border-box;
             box-sizing: border-box;
         }
-        
+        a:link {
+          color: red;
+        }
+
+        /* visited link */
+        a:visited {
+          color: green;
+        }
+
+        /* mouse over link */
+        a:hover {
+          color: hotpink;
+        }
+        a:active {
+  color: blue;
+}
+
         body {
             font-family: 'Nunito', sans-serif;
             color: #384047;
             background: #5d7370;
         }
-        
+
         form {
             max-width: 300px;
             margin: 10px auto;
@@ -27,12 +46,12 @@
             background: #f4f7f8;
             border-radius: 8px;
         }
-        
+
         h1 {
             margin: 0 0 30px 0;
             text-align: center;
         }
-        
+
         input[type="text"],
         input[type="password"],
         input[type="email"],
@@ -55,18 +74,18 @@
             box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03) inset;
             margin-bottom: 30px;
         }
-        
+
         input[type="radio"],
         input[type="checkbox"] {
             margin: 0 4px 8px 0;
         }
-        
+
         select {
             padding: 6px;
             height: 32px;
             border-radius: 2px;
         }
-        
+
         button {
             padding: 19px 39px 18px 39px;
             color: #FFF;
@@ -81,27 +100,27 @@
             box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1) inset;
             margin-bottom: 10px;
         }
-        
+
         fieldset {
             margin-bottom: 30px;
             border: none;
         }
-        
+
         legend {
             font-size: 1.4em;
             margin-bottom: 10px;
         }
-        
+
         label {
             display: block;
             margin-bottom: 8px;
         }
-        
+
         label.light {
             font-weight: 300;
             display: inline;
         }
-        
+
         .number {
             background-color: #5fcf80;
             color: #fff;
@@ -115,7 +134,7 @@
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
             border-radius: 100%;
         }
-        
+
         @media screen and (min-width: 480px) {
             form {
                 max-width: 480px;
@@ -125,26 +144,30 @@
 
     <body>
 
-        <form id="signup-form">{% csrf_token %}
-
+          <form id="signup-form">{% csrf_token %}
             <h1>Sign Up</h1>
 
+            
+
             <fieldset>
-                <legend><span class="number"></span>Your basic info</legend>
+                <div style="text-align:center">
+                <legend><b>Your basic info</b></legend>
+                </div><br>
+
                 <label for="user_name"><b>Name</b></label>
-                <input type="text" id="user_name" name="user_name" pattern="[A-Za-z]{1,15}" title="Username can only contain 1 to 15 letters">
+                <input type="text" id="user_name" name="user_name" class="form-control"  pattern="[A-Za-z]{1,15}" title="Username can only contain 1 to 15 letters" required>
 
                 <label for="user_email"><b>Email</b></label>
-                <input type="email" id="user_email" name="user_email" placeholder="emailxyz@123" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                <input type="email" id="user_email" name="user_email" class="form-control" placeholder="emailxyz@123" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
 
                 <label for="user_password"><b>Password</b></label>
-                <input type="password" id="user_password" name="user_password" pattern=".{6,}" title="six or more characters" placeholder="password@123">
+                <input type="password" id="user_password" name="user_password" class="form-control" pattern=".{6,}" title="six or more characters" placeholder="password@123" required>
 
                 <label for="user_mobile"><b>Phone number</b></label>
-                <input type="text" id="user_mobile" name="user_mobile" placeholder="9898989898">
+                <input type="text" id="user_mobile" name="user_mobile" class="form-control" placeholder="9898989898" maxlength="10" minlength="10">
 
                 <label for="user_constituency"><b>Select Constituency</b></label>
-                <select id="user_constituency" name="user_constituency">
+                <select id="user_constituency" name="user_constituency" class="form-control" required>
         <option value="Basavangudi">Basavanagudi</option>
         <option>Bommanahalli</option>
         <option>BTM Layout</option>
@@ -154,12 +177,16 @@
         <option>Vijayanagar</option>
         <option value="yeshwanthpur">Yeshwanthpur</option>
       </select>
-                <button type="submit" id="signup" type="submit">Create an
+                <button type="submit" class="btn btn-info" id="signup" type="submit">Create an
         account now</button>
-        </form>
+        </form><br><br>
+        <div style="text-align:center">
+         <a href="/login">Login</a>
+       </div>
     </body>
 
 </html>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <script>

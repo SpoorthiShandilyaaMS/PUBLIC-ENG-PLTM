@@ -1,0 +1,104 @@
+<html>
+<head></head>
+<body>
+    <div id="viewport">
+        {% include "appdb/navbar.html" %}
+        <!-- Content -->
+        <div id="content">
+            <div class="container-fluid">
+                <form id="addnews">{% csrf_token %}
+                  <div class="row">
+                  <div class="card well card-body bg-light header" id="myHeader" style="background-color:#5d7370;">
+                        <h2 class ='title'><b></p>ADD NEWS FEED</b></h2>
+                    </div>
+                    <hr><br>
+                    <div class="col-md-6">
+                        <label>Title</label>
+                        <textarea class="form-control" name="news_title" placeholder="News Title"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Description</label>
+                        <textarea class="form-control" name="news_description" placeholder="Description"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-info pull-right">ADD</button>
+                                        <div class="clearfix"></div>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    // on submit of addFeed form
+    $(document).on('submit', '#addnews', function(e) {
+            e.preventDefault();
+
+            //get form data
+            var form = document.getElementById('addnews');
+            var formData = new FormData(form);
+            formData.append('constituency_name', sessionStorage.getItem('uconsname'));
+            $.ajax({
+                url: "/addFeed",
+                data: formData,
+                cache: false,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                beforeSend: function() {},
+                success: function(response) {
+                    if (response['code'] == 200) {
+                        document.getElementById("addnews").reset();
+                        
+                        if (response['message'])
+                            Swal.fire({
+                                title: 'Success!',
+                                text: response['message'],
+                                title: 'News Feed Posted',
+                                icon: 'success'
+                            })                       
+
+
+                    } else if (response['code'] == 400) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response['message'],
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        })
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response['message'],
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        })
+                    }
+
+
+                },
+                error: function(error) {
+                    Swal.fire({
+                        title: 'oops!',
+                        text: "Something went wrong . Try again!!!",
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+            })
+        });
+
+</script>
+
+</html>
+
+
+
+
+</body>
+
+
+
+</html>

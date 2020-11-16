@@ -23,8 +23,10 @@ import json
 from django.utils import timezone
 import logging
 
+
 # function for homepage view
 def home_view(request):
+
     return render(request, 'appdb/home.html')
 
 
@@ -103,7 +105,7 @@ def login(request):
     if request.method =='POST':
         email = request.POST.get('user_email')
         pwd = request.POST.get('user_password')
-        type = request.POST.get('type')
+
 
         # if email and pwd not null
         if(email and pwd):
@@ -162,8 +164,6 @@ def add_feed(request):
         newsdesc = request.POST.get('news_description')
         constituencyname = request.POST.get('constituency_name')
 
-
-
         if(newstitle and newsdesc and constituencyname):
 
 
@@ -190,6 +190,10 @@ def add_feed(request):
                 'message': 'Please Enter proper Feeds!!',
             }
             return JsonResponse(responseData)
+
+    else:
+        
+        return render(request,'appdb/add_news.html')
 
 
 
@@ -567,41 +571,3 @@ def add_answer(request):
                 'message': 'Please Enter proper fields!!',
             }
             return JsonResponse(responseData)
-
-
-
-
-
-
-@csrf_exempt
-def get_all_query_answers(request):
-    if request.method == 'GET':
-        constid=request.GET.get('const_id')
-        if(constid):
-            try:
-                queryData = Query.objects.filter(qconst_id=constid).values('id','query','posted_by_name','qconst_id','qconst_name','answered_by')
-                queryData = list(queryData)
-
-                for query in queryData:
-                    return HttpResponse(query.id)
-                return HttpResponse(len(queryData))
-                    # answerData = Answer.objects.order_by('id').values('id','answer','answered_by_name','query_id','date')
-                responseData ={
-                    'code' : 200,
-                    'msg' : 'successfully queries shown',
-                    'data' : list(answerData),
-                    }
-                return JsonResponse(responseData, safe=False)
-            except Exception as e:
-                responseData = {
-                    'code': 500,
-                    'message': 'Something went wrong!!'+str(e),
-                }
-                return JsonResponse(responseData, safe=False)
-
-        else:
-            responseData ={
-            'code' : 400,
-            'msg' : 'Specify query ID'
-            }
-            return JsonResponse(responseData, safe=False)

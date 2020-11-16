@@ -1,0 +1,252 @@
+<head><script>
+    //for logout
+    function logout() {
+        sessionStorage.clear();
+        window.location = '/login';
+    }
+
+    //for checking sessions
+    function sessioncheck() {
+        if (!sessionStorage.getItem("status")) window.location = '/login';
+    }
+
+    $(document).ready(function () {
+        //to show corresponding nav bar
+        $('.representative-sidebar').hide();
+        $('.public-sidebar').hide();
+        $('.admin-sidebar').hide();
+        if (sessionStorage.getItem("usertype") == 'admin') $('.admin-sidebar').show();
+        else if (sessionStorage.getItem("usertype") == 'public') $('.public-sidebar').show();
+        else if (sessionStorage.getItem("usertype") == 'representative') $('.representative-sidebar').show();
+
+        if ($('.main-panel > .content').length == 0) {
+            $('.main-panel').css('height', '100%');
+        }
+        sessioncheck();
+    });
+</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500');
+
+        body {
+            overflow-x: hidden;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+        }
+
+        /* Toggle Styles */
+
+        #viewport {
+            padding-left: 250px;
+            -webkit-transition: all 0.5s ease;
+            -moz-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            transition: all 0.5s ease;
+        }
+
+        #content {
+            width: 100%;
+            position: relative;
+            margin-right: 0;
+        }
+
+        /* Sidebar Styles */
+
+        #sidebar {
+            z-index: 1000;
+            position: fixed;
+            left: 250px;
+            width: 250px;
+            height: 100%;
+            margin-left: -250px;s
+            overflow-y: auto;
+            background: #e3e7e9;
+            -webkit-transition: all 0.5s ease;
+            -moz-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            transition: all 0.5s ease;
+        }
+
+        #sidebar header {
+            background-color: #5d7370;
+            font-size: 20px;
+            line-height: 96px;
+            text-align: center;
+        }
+
+        #sidebar header a {
+            color: rgb(17, 15, 15);
+            display: block;
+            text-decoration: none;
+        }
+
+        #sidebar header a:hover {
+            color: rgb(22, 20, 20);
+        }
+
+        #sidebar .nav {}
+
+        #sidebar .nav a {
+            background: none;
+            border-bottom: 1px solid #455A64;
+            color: #1a1b1b;
+            font-size: 14px;
+            padding: 16px 24px;
+        }
+
+        #sidebar .nav a:hover {
+            background: none;
+            color: #0f1011;
+        }
+
+        #sidebar .nav a i {
+            margin-right: 16px;
+        }
+
+        .title {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+    </style>
+
+    <!-- //cdns -->
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet'
+        type='text/css'>
+    <link
+        href='https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css'
+        rel='stylesheet' type='text/css'>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+
+</head>
+<!--Admin Sidebar -->
+<div id="sidebar" class="admin-sidebar">
+    <header><a href="#">PEP</a></header>
+    <ul class="nav">
+        <li>
+            <a href="dashboard">
+                <i class="zmdi zmdi-view-dashboard"></i>Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="addFeed">
+                <i class="zmdi zmdi-plus"></i>Add News
+
+            </a>
+        </li>
+
+        <li>
+            <a href="manage_news">
+                <i class="zmdi zmdi-edit"></i>Manage News
+
+            </a>
+        </li>
+
+        <li>
+            <a href="add_query">
+                <i class="zmdi zmdi-help-outline"></i>Add Query
+
+            </a>
+        </li>
+        <li>
+            <a href="talk">
+                <i class="zmdi zmdi-comment-edit"></i>Manage Query
+
+            </a>
+        </li>
+
+        <li>
+            <a href="#" onclick="logout()">
+                <i class="zmdi zmdi-time-restore-setting"></i>Logout
+
+            </a>
+        </li>
+        <li>
+            <a href="#">USER:
+                <b>
+                    <script>document.write(sessionStorage.getItem("username"));</script> </b></a>
+            <br>
+            <br><br><br><br><br>
+        </li>
+    </ul>
+</div>
+
+<!-- Public sidebar -->
+<div id="sidebar" class="public-sidebar">
+    <header><a href="#">PEP</a></header>
+    <ul class="nav">
+        <li>
+            <a href="dashboard">
+                <i class="zmdi zmdi-view-dashboard"></i>Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="add_complaint">
+                <i class="zmdi zmdi-redo"></i>Complaint
+               
+
+            </a>
+        </li>
+        <li>
+            <a href="polling">
+                
+                <i class="zmdi zmdi-thumb-up zmd-fw"></i>Polling
+
+            </a>
+        </li>
+        <li>
+            <a href="add_answer">
+                <i class="zmdi zmdi-comment-edit"></i>Answer
+
+            </a>
+        </li>
+
+        <li>
+            <a href="#" onclick="logout()">
+                <i class="zmdi zmdi-time-restore-setting"></i>Logout
+
+            </a>
+        </li>
+        <li>
+            <a href="#">USER:
+                <b>
+                    <script>document.write(sessionStorage.getItem("username"));</script> </b></a>
+            <br>
+            <br><br><br><br><br>
+        </li>
+    </ul>
+</div>
+
+<!-- Representative sidebar -->
+<div id="sidebar" class="representative-sidebar">
+    <header><a href="#">PEP</a></header>
+    <ul class="nav">
+        <li>
+            <a href="dashboard">
+                <i class="zmdi zmdi-view-dashboard"></i>Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="talk">
+                <i class="zmdi zmdi-comment-edit"></i>Q&A
+            </a>
+        </li>
+
+        <li>
+            <a href="#" onclick="logout()">
+                <i class="zmdi zmdi-time-restore-setting"></i>Logout
+
+            </a>
+        </li>
+        <li>
+            <a href="#">USER:
+                <b>
+                    <script>document.write(sessionStorage.getItem("username"));</script> </b></a>
+            <br>
+            <br><br><br><br><br>
+        </li>
+    </ul>
+</div>
