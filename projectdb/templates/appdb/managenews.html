@@ -1,0 +1,194 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <style>
+        .header {
+
+            padding: 10px 16px;
+            background: #37474F;
+            color: #0e0b0b;
+
+        }
+
+        .sticky {
+
+            position: sticky;
+            top: 0;
+            z-index: 1071;
+            top: 0;
+            width: 100%;
+
+        }
+
+        .sticky+.content {
+            padding-top: 102px;
+        }
+    </style>
+    </head>
+
+    <body>
+        <div id="viewport">
+            {% include "appdb/navbar.html" %}
+            <!-- Content -->
+            <div id="content" class="container">
+
+                <div class="container-fluid">
+                    <div class="row ">
+                        <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+                            <!-- Modal -->
+                            <div class="modal fade" id="myModal" role="dialog">
+                                <div class="modal-dialog">
+
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Edit News</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form>
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label>Title</label>
+                                                    <textarea class="form-control" name="news_title"
+                                                        placeholder="News Title" rows="2" cols="40"></textarea>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Description</label>
+                                                    <textarea class="form-control" name="news_description"
+                                                        placeholder="Description" rows="7" cols="60"></textarea>
+
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-info pull-right">Save changes</button>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <h2 class='title'><b></p>MANAGE NEWSFEED</b></h2>
+                        </div>
+                        <div class="content" id="feeds">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </body>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        $(document).ready(function () {
+            getAllFeeds(sessionStorage.getItem("const_id"));
+        })
+        function getAllFeeds(const_id) {
+            $.ajax({
+                url: "/getAllFeeds?const_id=" + const_id,
+                cache: false,
+                processData: false,
+                contentType: false,
+                type: 'GET',
+                beforeSend: function () { },
+                success: function (response) {
+
+                    var data = '';
+                    var feedData = response.data
+
+                    for (var i = 0; i < feedData.length; i++) {
+                        data += '<div  id="feed' + feedData[i].id + '" class="jumbotron"><small><b>' + response.data[i].feed_date + '</b></small><hr><large id="feedtitle' + feedData[i].id + '"><b>' + response.data[i].feed_title + '</b></large><br><small id="feeddesc' + feedData[0].id + '">' + response.data[i].feed_description + '</small><br><br>' +
+                            '<div class="btn-group" >' +
+                            '<button type="button" data-toggle="modal" data-target="#myModal" onclick="editFeed(' + feedData[i].id + ')"  class="btn btn-success">Edit</button>' +
+                            '<button onclick="deleteFeed(' + feedData[i].id + ')" type="submit" class="btn btn-danger">Delete</button>' +
+                            '</div></div>'+
+                            '<div id="added" class="alert alert-success alert-dismissible" hidden>'+
+                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                            '<strong id="edit_feed_msg"></strong></div>';
+                    }
+
+                    $('#feeds').html(data);
+                    window.scrollBy(100, 0);
+                },
+                error: function (error) {
+                }
+            })
+        }
+
+        // delete news feed
+        function deleteFeed(feedId) {        
+            var data = new FormData();
+            data.append('feed_id',feedId);          
+            $.ajax({
+                url: "/deleteFeed",
+                cache: false,
+                data: data,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                beforeSend: function () { },
+                success: function (response) {
+                    if (response['code'] == 200) {
+                        $("#feed"+feedId).remove()
+                        Swal.fire({
+                            
+                            text: response['message'],
+                            icon:'warning',
+                            confirmButtonText: 'Save Changes',
+                        
+                        })
+                    }
+                    
+                    else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response['message'],
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        })
+                    }
+                },
+                error: function (error) {
+                }
+            })
+        }
+
+        // edit news feed
+        function editFeed(feedId) {
+
+        }
+
+        window.onscroll = function () { myFunction() };
+
+        var header = document.getElementById("myHeader");
+        var sticky = header.offsetTop;
+
+        function myFunction() {
+            if (window.pageYOffset > sticky) {
+                header.classList.add("sticky");
+            } else {
+                header.classList.remove("sticky");
+            }
+        }
+    </script>
+
+
+
+
+
+
+</body>
+
+
+
+
+</html>

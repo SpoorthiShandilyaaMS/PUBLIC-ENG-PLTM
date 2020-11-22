@@ -28,12 +28,12 @@
     <div id="viewport">
         {% include "appdb/navbar.html" %}
         <!-- Content -->
-        <div id="content">
+        <div id="content" class="container">
             <div class="container-fluid">
 
                 <div class="row">
-                    <div class="card well card-body bg-light header" id="myHeader" style="background-color:#5d7370;">
-                        <p class ='title'><b></p>NEWS FEED</b></p>
+                    <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+                        <h2 class ='title'><b></p>NEWS FEED</b></h2>
                     </div>
                     <div class="content" id="feeds"></div>
                 </div>
@@ -72,11 +72,11 @@
             contentType: false,
             type: 'GET',
             beforeSend: function () { },
-            success: function (response) {
-                console.log(response);
+            success: function (response) {              
                 var data = '';
                 for (var i = 0; i < response.data.length; i++) {
-                    data += '<div><small><b>' + response.data[i].feed_date + '</b></small><hr><large><b>' + response.data[i].feed_title + '</b></large><p><br><small>' + response.data[i].feed_description + '</small></p><hr><hr> </div>';
+                    var dateTime = new Date(response.data[i].feed_date);
+                    data += '<div class="jumbotron"><small><b>' + dateTime.toUTCString() + '</b></small><hr><large><b>' + response.data[i].feed_title + '</b></large><br><small>' + response.data[i].feed_description + '</small> </div>';
                 }
 
                 $('#feeds').html(data);

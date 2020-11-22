@@ -195,7 +195,10 @@ def add_feed(request):
         
         return render(request,'appdb/add_news.html')
 
-
+@csrf_exempt
+def manageFeed(request):
+    if request.method == 'GET':
+        return render(request,'appdb/managenews.html')
 
 
 
@@ -286,6 +289,7 @@ def delete_feed(request):
     if request.method=='POST':
         feedid = request.POST.get('feed_id')
 
+
         if(feedid):
             try:
                 if News_Feed.objects.filter(id=feedid).exists():
@@ -294,7 +298,7 @@ def delete_feed(request):
                     responseData = {
                     'code': 200,
                     'feed_id':feedid,
-                    'message': 'Successfully deleted news feed',
+                    'message': 'Successfully deleted ',
                     }
                     return JsonResponse(responseData)
                 else:

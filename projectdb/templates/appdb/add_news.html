@@ -1,27 +1,46 @@
 <html>
-<head></head>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
 <body>
     <div id="viewport">
         {% include "appdb/navbar.html" %}
         <!-- Content -->
-        <div id="content">
+        <div id="content" class="container">
             <div class="container-fluid">
                 <form id="addnews">{% csrf_token %}
                   <div class="row">
-                  <div class="card well card-body bg-light header" id="myHeader" style="background-color:#5d7370;">
+                  <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
                         <h2 class ='title'><b></p>ADD NEWS FEED</b></h2>
                     </div>
-                    <hr><br>
-                    <div class="col-md-6">
-                        <label>Title</label>
-                        <textarea class="form-control" name="news_title" placeholder="News Title"></textarea>
+                   
+                    <div class="jumbotron">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Title</label>
+                                <textarea class="form-control" name="news_title" placeholder="News Title" rows="2" cols="40"></textarea>
+                            </div>
+                        </div>
+                        <br><br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Description</label>
+                                <textarea class="form-control" name="news_description" placeholder="Description" rows="7" cols="60"></textarea>
+                            </div>
+                        </div>
+                        <br><br>
+                        <div class="row">
+                            <center><button type="submit" class="btn btn-info">ADD</button></center>
+                        </div>
+                        <br>
+                        <div id="added" class="alert alert-success alert-dismissible" hidden>
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <strong id="added_msg"></strong>
+                          </div>
                     </div>
-                    <div class="col-md-6">
-                        <label>Description</label>
-                        <textarea class="form-control" name="news_description" placeholder="Description"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-info pull-right">ADD</button>
-                                        <div class="clearfix"></div>
+                    
+                    
+                    
                   </form>
                 </div>
             </div>
@@ -32,6 +51,9 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
+     $(".close").click(function(){
+            $("#added").hide()  
+        })
     // on submit of addFeed form
     $(document).on('submit', '#addnews', function(e) {
             e.preventDefault();
@@ -51,15 +73,9 @@
                 success: function(response) {
                     if (response['code'] == 200) {
                         document.getElementById("addnews").reset();
-                        
-                        if (response['message'])
-                            Swal.fire({
-                                title: 'Success!',
-                                text: response['message'],
-                                title: 'News Feed Posted',
-                                icon: 'success'
-                            })                       
 
+                        $("#added_msg").html(response['message'])
+                        $("#added").show()                                        
 
                     } else if (response['code'] == 400) {
                         Swal.fire({
@@ -89,6 +105,8 @@
                 }
             })
         });
+
+       
 
 </script>
 
