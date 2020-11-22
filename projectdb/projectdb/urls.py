@@ -23,16 +23,16 @@ urlpatterns = [
     path('signup',views.get_signup_data,name='signup'),
     path('login',views.login,name='login'),
     path('addFeed',views.add_feed,name='addfeed'),
+    path('manageFeed',views.manageFeed,name='manageFeed'),
     path('getAllFeeds',views.get_all_feeds,name='getAllFeeds'),
     path('editfeed',views.edit_feed,name='editfeeds'),
-    path('deletefeed',views.delete_feed,name='deletefeed'),
+    path('deleteFeed',views.delete_feed,name='deleteFeed'),
     path('addcomplaint',views.add_complaint,name='addcomplaint'),
     path('getallcomplaints',views.get_all_complaints,name='getallcomplaints'),
     path('addquery',views.add_query,name='addquery'),
     path('getallqueries',views.get_all_queries,name='getallqueries'),
     path('upvote',views.upvote,name='upvote'),
     path('addanswer',views.add_answer,name='addanswer'),
-    path('getallqueryanswers',views.get_all_query_answers,name='getallqueryanswers'),
     path('dashboard',views.dashboard,name='dashboard')
 
 ]
