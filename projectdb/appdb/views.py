@@ -487,6 +487,11 @@ def add_query(request):
                 'message': 'Please Enter proper query details!!',
             }
             return JsonResponse(responseData)
+    else:
+        return render(request,'appdb/addquery.html')
+
+
+
 
 @csrf_exempt
 def get_all_queries(request):

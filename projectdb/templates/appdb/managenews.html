@@ -17,7 +17,7 @@
 
         }
 
-        .sticky {
+        /* .sticky {
 
             position: sticky;
             top: 0;
@@ -25,7 +25,7 @@
             top: 0;
             width: 100%;
 
-        }
+        } */
 
         .sticky+.content {
             padding-top: 102px;
@@ -43,7 +43,7 @@
                     <div class="row ">
                         <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
                             <!-- Modal -->
-                            <div class="modal fade" id="myModal" role="dialog">
+                            <div class="modal fade" id="editNewsModal" role="dialog">
                                 <div class="modal-dialog">
 
                                     <!-- Modal content-->
@@ -53,23 +53,28 @@
                                             <h4 class="modal-title">Edit News</h4>
                                         </div>
                                         <div class="modal-body">
-                                            <form>
+                                            <form id="editFeed">
+                                                <input type="text" id="editFeedId" hidden>
                                                 {% csrf_token %}
                                                 <div class="form-group">
                                                     <label>Title</label>
                                                     <textarea class="form-control" name="news_title"
-                                                        placeholder="News Title" rows="2" cols="40"></textarea>
+                                                        id="edit_news_title" placeholder="News Title" rows="2"
+                                                        cols="40"></textarea>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Description</label>
                                                     <textarea class="form-control" name="news_description"
-                                                        placeholder="Description" rows="7" cols="60"></textarea>
+                                                        id="edit_news_description" placeholder="Description" rows="7"
+                                                        cols="60"></textarea>
 
                                                 </div>
                                             </form>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="submit" class="btn btn-info pull-right">Save changes</button>
+                                            <button type="submit" id="editFeedBtn" onclick="editFeed()"
+                                                class="btn btn-info pull-right">Save
+                                                changes</button>
                                             <div class="clearfix"></div>
                                         </div>
                                     </div>
@@ -89,6 +94,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
+        // scroll function
+        window.onscroll = function () { myFunction() };
+
+        var header = document.getElementById("myHeader");
+        var sticky = header.offsetTop; function myFunction() {
+            if (window.pageYOffset > sticky) {
+                header.classList.add("sticky");
+            } else {
+                header.classList.remove("sticky");
+            }
+        }
+
+        var feedData;
         $(document).ready(function () {
             getAllFeeds(sessionStorage.getItem("const_id"));
         })
@@ -103,17 +121,14 @@
                 success: function (response) {
 
                     var data = '';
-                    var feedData = response.data
+                    feedData = response.data
 
                     for (var i = 0; i < feedData.length; i++) {
                         data += '<div  id="feed' + feedData[i].id + '" class="jumbotron"><small><b>' + response.data[i].feed_date + '</b></small><hr><large id="feedtitle' + feedData[i].id + '"><b>' + response.data[i].feed_title + '</b></large><br><small id="feeddesc' + feedData[0].id + '">' + response.data[i].feed_description + '</small><br><br>' +
                             '<div class="btn-group" >' +
-                            '<button type="button" data-toggle="modal" data-target="#myModal" onclick="editFeed(' + feedData[i].id + ')"  class="btn btn-success">Edit</button>' +
+                            '<button type="button" data-toggle="modal" data-target="#editNewsModal" onclick="openEditFeed(' + feedData[i].id + ')"  class="btn btn-success">Edit</button>' +
                             '<button onclick="deleteFeed(' + feedData[i].id + ')" type="submit" class="btn btn-danger">Delete</button>' +
-                            '</div></div>'+
-                            '<div id="added" class="alert alert-success alert-dismissible" hidden>'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong id="edit_feed_msg"></strong></div>';
+                            '</div></div>';
                     }
 
                     $('#feeds').html(data);
@@ -125,9 +140,9 @@
         }
 
         // delete news feed
-        function deleteFeed(feedId) {        
+        function deleteFeed(feedId) {
             var data = new FormData();
-            data.append('feed_id',feedId);          
+            data.append('feed_id', feedId);
             $.ajax({
                 url: "/deleteFeed",
                 cache: false,
@@ -138,16 +153,16 @@
                 beforeSend: function () { },
                 success: function (response) {
                     if (response['code'] == 200) {
-                        $("#feed"+feedId).remove()
+                        $("#feed" + feedId).remove()
                         Swal.fire({
-                            
+
                             text: response['message'],
-                            icon:'warning',
+                            icon: 'warning',
                             confirmButtonText: 'Save Changes',
-                        
+
                         })
                     }
-                    
+
                     else {
                         Swal.fire({
                             title: 'Error!',
@@ -162,23 +177,79 @@
             })
         }
 
-        // edit news feed
-        function editFeed(feedId) {
-
+        // on open - edit news feed
+        function openEditFeed(feedId) {
+            $("textarea#edit_news_title").val("");
+            $("textarea#edit_news_description").val("");
+            console.log(feedId, feedData)
+            feedData.forEach(function (feed) {
+                if (feed['id'] == feedId) {
+                    console.log(feed);
+                    $("#editFeedId").val(feedId);
+                    $("textarea#edit_news_title").val(feed['feed_title']);
+                    $("textarea#edit_news_description").val(feed['feed_description']);
+                }
+            });
         }
 
-        window.onscroll = function () { myFunction() };
+        // on submit of addFeed form
+        function editFeed() {
+            //get form data
+            console.log($('#editFeedId').val())
+            var form = document.getElementById('editFeed');
+            var formData = new FormData(form);
+            formData.append('feed_id', $('#editFeedId').val());
+            $.ajax({
+                url: "editfeed",
+                data: formData,
+                cache: false,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                beforeSend: function () { },
+                success: function (response) {
+                    if (response['code'] == 200) {
+                        // $('#editNewsModal').modal('hide');
+                        $('#editNewsModal').hide();
+                        $('body').removeClass('modal-open');
+                        $('.modal-backdrop').remove();
+                        $("#feedtitle" + response['feed_id']).html("<b>" + response['newstitle'] + "</b>");
+                        $("#feeddesc" + response['feed_id']).html(response['newsdesc'])
 
-        var header = document.getElementById("myHeader");
-        var sticky = header.offsetTop;
+                        Swal.fire({
+                            title: 'Success!',
+                            text: response['message'],
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        })
 
-        function myFunction() {
-            if (window.pageYOffset > sticky) {
-                header.classList.add("sticky");
-            } else {
-                header.classList.remove("sticky");
-            }
+                    } else if (response['code'] == 400) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response['message'],
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        })
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response['message'],
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        })
+                    }
+                },
+                error: function (error) {
+                    Swal.fire({
+                        title: 'oops!',
+                        text: "Something went wrong . Try again!!!",
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+            })
         }
+
     </script>
 
 
