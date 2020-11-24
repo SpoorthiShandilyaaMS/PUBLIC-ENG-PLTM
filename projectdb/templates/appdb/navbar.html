@@ -1,31 +1,33 @@
 <head>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script><script>
-    //for logout
-    function logout() {
-        sessionStorage.clear();
-        window.location = '/login';
-    }
-
-    //for checking sessions
-    function sessioncheck() {
-        if (!sessionStorage.getItem("status")) window.location = '/login';
-    }
-
-    $(document).ready(function () {
-        //to show corresponding nav bar
-        $('.representative-sidebar').hide();
-        $('.public-sidebar').hide();
-        $('.admin-sidebar').hide();
-        if (sessionStorage.getItem("usertype") == 'admin') $('.admin-sidebar').show();
-        else if (sessionStorage.getItem("usertype") == 'public') $('.public-sidebar').show();
-        else if (sessionStorage.getItem("usertype") == 'representative') $('.representative-sidebar').show();
-
-        if ($('.main-panel > .content').length == 0) {
-            $('.main-panel').css('height', '100%');
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script>
+        //for logout
+        function logout() {
+            sessionStorage.clear();
+            window.location = '/login';
         }
-        sessioncheck();
-    });
-</script>
+
+        //for checking sessions
+        function sessioncheck() {
+            if (!sessionStorage.getItem("status")) window.location = '/login';
+        }
+
+        $(document).ready(function () {
+            // console.log(sessionStorage.getItem("usertype"))
+            //to show corresponding nav bar
+            $('.representative-sidebar').hide();
+            $('.public-sidebar').hide();
+            $('.admin-sidebar').hide();
+            if (sessionStorage.getItem("usertype") == 'admin') $('.admin-sidebar').show();
+            else if (sessionStorage.getItem("usertype") == 'public') $('.public-sidebar').show();
+            else if (sessionStorage.getItem("usertype") == 'representative') $('.representative-sidebar').show();
+
+            if ($('.main-panel > .content').length == 0) {
+                $('.main-panel').css('height', '100%');
+            }
+            sessioncheck();
+        });
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500');
 
@@ -59,8 +61,8 @@
             left: 250px;
             width: 250px;
             height: 100%;
-            margin-left: -250px;s
-            overflow-y: auto;
+            margin-left: -250px;
+            s overflow-y: auto;
             background: #e3e7e9;
             -webkit-transition: all 0.5s ease;
             -moz-transition: all 0.5s ease;
@@ -108,7 +110,6 @@
             margin-top: 0;
             margin-bottom: 5px;
         }
-
     </style>
 
     <!-- //cdns -->
@@ -145,14 +146,8 @@
         </li>
 
         <li>
-            <a href="add_query">
-                <i class="zmdi zmdi-help-outline"></i>Add Query
-
-            </a>
-        </li>
-        <li>
-            <a href="talk">
-                <i class="zmdi zmdi-comment-edit"></i>Manage Query
+            <a href="addquery">
+                <i class="zmdi zmdi-help-outline"></i>Manage Query
 
             </a>
         </li>
@@ -185,13 +180,13 @@
         <li>
             <a href="add_complaint">
                 <i class="zmdi zmdi-redo"></i>Complaint
-               
+
 
             </a>
         </li>
         <li>
             <a href="polling">
-                
+
                 <i class="zmdi zmdi-thumb-up zmd-fw"></i>Polling
 
             </a>

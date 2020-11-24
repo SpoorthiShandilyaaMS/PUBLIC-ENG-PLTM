@@ -1,0 +1,162 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+    <div id="viewport">
+        {% include "appdb/navbar.html" %}
+        <!-- Content -->
+        <div id="content" class="container">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12 card well card-body bg-light header" id="myHeader"
+                        style="background-color:#eee;">
+                        <h2 class='title'><b></p>TALK</b></h2>
+                    </div>
+                    <form id="query">{% csrf_token %}
+                        <div class="jumbotron">
+                            <div class="md-form">
+
+                                <div class="md-form">
+                                    <label>Question</label>
+                                    <textarea class="md-textarea form-control" name="query"
+                                        placeholder="Your question...."></textarea>
+                                </div>
+                            </div>
+
+                            <br><br>
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <button type="submit" class="btn btn-success">Submit</button></div>
+                            </div>
+                            <br><br>
+                            <div id="queryadded" class="alert alert-success alert-dismissible" hidden>
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong id="query_msg"></strong>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="content" class="container">
+            <div class="col-md-12 card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+                <h2 class='title'><b></p>QUERIES</b></h2>
+            </div>
+            <div id="added_queries" class="content">
+
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    // close added_alert
+    $(".close").click(function () {
+        $("#queryadded").hide()
+    })
+
+    $(document).ready(function () {
+        getAllQueries(sessionStorage.getItem('const_id'))
+    })
+    // get all queries
+    function getAllQueries(const_id) {
+        $.ajax({
+            url: "/getallqueries?const_id=" + const_id,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'GET',
+            beforeSend: function () { },
+            success: function (response) {
+                console.log(response, response.data);
+                var queryData = response.data;
+                var data = "";
+                queryData.forEach(function (query) {
+                    data += '<div id="query' + query.id + '" class="jumbotron"><small><b>' + query.date + '</b></small>' +
+                        '<hr><large id="querydesc' + query.id + '"><b>' + query.query + '</b></large><br><br>' +
+                        '<div class="btn-group"><button type="button" data-toggle="modal" data-target="#editQueryModal" onclick="openEditquery(' + query.id + ')" class="btn btn-success">Edit</button>' +
+                        '<button onclick="deleteQuery(' + query.id + ')" type="submit" class="btn btn-danger">Delete</button></div></div>';
+                });
+                $('#added_queries').html(data);
+                window.scrollBy(100, 0);
+            },
+
+            error: function (error) {
+            }
+        })
+    }
+
+    // on submit of query form
+    $(document).on('submit', '#query', function (e) {
+        e.preventDefault();
+        //get form data
+        var form = document.getElementById('query');
+        var formData = new FormData(form);
+        formData.append('posted_by_name', sessionStorage.getItem('username'));
+        formData.append('qconst_name', sessionStorage.getItem('uconsname'));
+        console.log(formData.values())
+        $.ajax({
+            url: "/addquery",
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            beforeSend: function () { },
+            success: function (response) {
+                if (response['code'] == 200) {
+                    document.getElementById("query").reset();
+
+                    $("#query_msg").html(response['message'])
+                    $("#queryadded").show()
+
+                } else if (response['code'] == 400) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+
+
+            },
+            error: function (error) {
+                Swal.fire({
+                    title: 'oops!',
+                    text: "Something went wrong . Try again!!!",
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                })
+            }
+        })
+    });
+
+
+
+</script>
+
+</html>
+
+
+
+
+</body>
+
+
+
+</html>

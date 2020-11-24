@@ -17,7 +17,7 @@ class User(models.Model):
     uemail=models.EmailField(primary_key=True,null=False)
     upassword=models.CharField(max_length=20,null=False)
     umobile=models.CharField(max_length=10,null=True,blank=True)
-    uconsname=models.CharField(max_length=20,default='basavangudi')
+    uconsname=models.CharField(max_length=20,default='Basavangudi')
     usertype=models.CharField(max_length=10,null=True)
 
 
