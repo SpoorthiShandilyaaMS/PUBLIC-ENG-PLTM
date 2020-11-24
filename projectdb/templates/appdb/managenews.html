@@ -124,10 +124,14 @@
                     feedData = response.data
 
                     for (var i = 0; i < feedData.length; i++) {
-                        data += '<div  id="feed' + feedData[i].id + '" class="jumbotron"><small><b>' + response.data[i].feed_date + '</b></small><hr><large id="feedtitle' + feedData[i].id + '"><b>' + response.data[i].feed_title + '</b></large><br><small id="feeddesc' + feedData[0].id + '">' + response.data[i].feed_description + '</small><br><br>' +
+                        var feed_id = feedData[i].id;
+                        var feed_date = response.data[i].feed_date;
+                        var feed_title = response.data[i].feed_title;
+                        var feed_desc = response.data[i].feed_description;
+                        data += '<div  id="feed' + feed_id + '"class="jumbotron"><small><b>' + feed_date + '</b></small><hr><large id="feedtitle' + feed_id + '"><b>' + feed_title + '</b></large><br><small id="feeddesc' + feed_id + '">' + feed_desc + '</small><br><br>' +
                             '<div class="btn-group" >' +
-                            '<button type="button" data-toggle="modal" data-target="#editNewsModal" onclick="openEditFeed(' + feedData[i].id + ')"  class="btn btn-success">Edit</button>' +
-                            '<button onclick="deleteFeed(' + feedData[i].id + ')" type="submit" class="btn btn-danger">Delete</button>' +
+                            '<button type="button" data-toggle="modal" data-target="#editNewsModal" onclick="openEditFeed(' + feed_id + ')"  class="btn btn-success">Edit</button>' +
+                            '<button onclick="deleteFeed(' + feed_id + ')" type="submit" class="btn btn-danger">Delete</button>' +
                             '</div></div>';
                     }
 

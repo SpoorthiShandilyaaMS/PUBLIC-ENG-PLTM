@@ -464,8 +464,6 @@ def add_query(request):
 
             const_id = get_object_or_404(Constituency,constituency_name=qconstname).constituency
 
-
-
             try:
                 reg = Query(query=query,posted_by_name=postedbyname,qconst_id=const_id,qconst_name=qconstname)
                 regstatus = reg.save()
@@ -488,7 +486,7 @@ def add_query(request):
             }
             return JsonResponse(responseData)
     else:
-        return render(request,'appdb/addquery.html')
+        return render(request,'appdb/managequery.html')
 
 
 
