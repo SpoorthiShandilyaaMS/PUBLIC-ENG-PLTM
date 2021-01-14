@@ -1,6 +1,9 @@
-<html>
-
+<!DOCTYPE html>
+{% load static%}
 <head>
+    <title>ManageNews</title>
+    <link rel = "icon" href ="{%static 'img/p.jpg'%}"
+          type = "image/x-icon"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -42,6 +45,8 @@
                 <div class="container-fluid">
                     <div class="row ">
                         <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+                            
+                            <h2 class='title'><b><span style="color:#1e718a;">Manage </span><span style="color:#1e718a;">News</span><span style="color:#1e718a;">Feed </span></b></h2>
                             <!-- Modal -->
                             <div class="modal fade" id="editNewsModal" role="dialog">
                                 <div class="modal-dialog">
@@ -53,7 +58,7 @@
                                             <h4 class="modal-title">Edit News</h4>
                                         </div>
                                         <div class="modal-body">
-                                            <form id="editFeed">
+                                            <form id="editFeed" enctype="multipart/form-data">{% csrf_token %}
                                                 <input type="text" id="editFeedId" hidden>
                                                 {% csrf_token %}
                                                 <div class="form-group">
@@ -69,6 +74,7 @@
                                                         cols="60"></textarea>
 
                                                 </div>
+                                                
                                             </form>
                                         </div>
                                         <div class="modal-footer">
@@ -81,7 +87,6 @@
 
                                 </div>
                             </div>
-                            <h2 class='title'><b></p>MANAGE NEWSFEED</b></h2>
                         </div>
                         <div class="content" id="feeds">
                         </div>
@@ -128,15 +133,17 @@
                         var feed_date = response.data[i].feed_date;
                         var feed_title = response.data[i].feed_title;
                         var feed_desc = response.data[i].feed_description;
-                        data += '<div  id="feed' + feed_id + '"class="jumbotron"><small><b>' + feed_date + '</b></small><hr><large id="feedtitle' + feed_id + '"><b>' + feed_title + '</b></large><br><small id="feeddesc' + feed_id + '">' + feed_desc + '</small><br><br>' +
-                            '<div class="btn-group" >' +
+                        var dateTime = new Date(response.data[i].feed_date);
+                        data += '<div  id="feed' + feed_id + '"class="jumbotron"><small><b>' + dateTime.toLocaleString('en-IN','lookup') + '</b></small><hr><large id="feedtitle' + feed_id + '"><b>' + feed_title + '</b></large><br><small id="feeddesc' + feed_id + '">' + feed_desc + '</small><br><br>';
+                        if (response.data[i].newsimage)
+                            data += '<br><br><img src="' + response.data[i].newsimage + '" width="400" height="300"><br><br>';
+                        data += '<div class="btn-group" >' +
                             '<button type="button" data-toggle="modal" data-target="#editNewsModal" onclick="openEditFeed(' + feed_id + ')"  class="btn btn-success">Edit</button>' +
                             '<button onclick="deleteFeed(' + feed_id + ')" type="submit" class="btn btn-danger">Delete</button>' +
                             '</div></div>';
+                        $('#feeds').html(data);
+                        window.scrollBy(100, 0);
                     }
-
-                    $('#feeds').html(data);
-                    window.scrollBy(100, 0);
                 },
                 error: function (error) {
                 }
@@ -219,6 +226,13 @@
                         $('.modal-backdrop').remove();
                         $("#feedtitle" + response['feed_id']).html("<b>" + response['newstitle'] + "</b>");
                         $("#feeddesc" + response['feed_id']).html(response['newsdesc'])
+
+                        feedData.forEach(function (feed) {
+                            if (feed['id'] == $('#editFeedId').val()) {
+                                feed['feed_title'] = response['newstitle'];
+                                feed['feed_description'] = response['newsdesc'];
+                            }
+                        });
 
                         Swal.fire({
                             title: 'Success!',

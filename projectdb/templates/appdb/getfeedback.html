@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+{% load static%}
+
+<head>
+    <title>Feedback</title>
+    <link rel = "icon" href ="{%static 'img/p.jpg'%}"
+          type = "image/x-icon"> 
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+    <div id="viewport">
+        {% include "appdb/navbar.html" %}
+        <!-- Content -->
+        <div id="content" class="container">
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+                        <h2 class='title'><b><span style="color:#1e718a;">Feedback </span></b></h2>
+                      
+
+                    </div>
+                    <div class="content" id="feedback"></div>
+                        
+                    
+                </div>
+            </div>
+        </div>
+        </div>
+</body>
+
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    $(document).ready(function () {
+        getAllFeedbacks(sessionStorage.getItem("const_id"));
+    })
+    function getAllFeedbacks(const_id) {
+
+        $.ajax({
+            url: "/getallfeedback?const_id=" + const_id,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'GET',
+            beforeSend: function () { },
+            success: function (response) {
+                var data = '';
+                for (var i = 0; i < response.data.length; i++) {
+                    var dateTime = new Date(response.data[i].recdate);
+                    data += '<div class="jumbotron"><small><b>' + dateTime.toLocaleString('en-IN') + '</b></small><hr><large><b>' + response.data[i].subject + '</b></large><br>' + '<small><b>' + response.data[i].message + '</b></small><hr><br>' +
+                        '<label>Name:<span style="padding-left:10px"></span></label>' + response.data[i].name + '<span style="padding-left:60px"></span><label>Email :<span style="padding-left:10px"></span>' +
+                        '</label>' + response.data[i].email + '<span style="padding-left:60px"></span><label>Contact No. :<span style="padding-left:10px"></span> </label>' + response.data[i].contactno + '</div>';
+                }
+                
+               
+
+                $('#feedback').html(data);
+                window.scrollBy(100, 0);
+            },
+            error: function (error) {
+            }
+        })
+    }
+
+
+</script>

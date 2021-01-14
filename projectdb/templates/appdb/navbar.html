@@ -1,5 +1,7 @@
 <head>
+   
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
     <script>
         //for logout
         function logout() {
@@ -27,6 +29,59 @@
             }
             sessioncheck();
         });
+        
+
+        function feedback() {
+          
+            var form = document.getElementById('feedbackform');
+            var formData = new FormData(form);
+            formData.append('qcons_name', sessionStorage.getItem('uconsname'));
+            $.ajax({
+                url: "/feedback",
+                data: formData,
+                cache: false,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                beforeSend: function () { },
+                success: function (response) {
+                    if (response['code'] == 200) {
+                        document.getElementById("feedbackform").reset();
+                        Swal.fire({
+                            // title: 'Success!',
+                            text: response['message'],
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        })
+                    }
+                    else if (response['code'] == 400) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response['message'],
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        })
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response['message'],
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        })
+                    }
+                },
+                error: function (error) {
+                    Swal.fire({
+                        title: 'oops!',
+                        text: "Something went wrong . Try again!!!",
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+
+                }
+            })
+        }
+
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500');
@@ -115,6 +170,7 @@
     <!-- //cdns -->
     <link href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet'
         type='text/css'>
+
     <link
         href='https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css'
         rel='stylesheet' type='text/css'>
@@ -123,43 +179,53 @@
 </head>
 <!--Admin Sidebar -->
 <div id="sidebar" class="admin-sidebar">
-    <header><a href="#" style="background-color:rgb(190, 190, 190)">PEP</a></header>
+    <header><a href="#" style="background-color:rgb(190, 190, 190);font-weight: 700"><span style="color:rgb(63, 60, 60);background-color: transparent;">P </span><span style="color:#1e718a;background-color: transparent;">E </span><span style="color:rgb(63, 60, 60);background-color: transparent;">P</span></a></header>
     <ul class="nav">
-        <li>
-            <a href="dashboard">
-                <i class="zmdi zmdi-view-dashboard"></i>Dashboard
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="home" style="color:rgb(241, 236, 236)">
+                <i class="zmdi zmdi-home"></i>Home
+            </a>
+        </li>
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="dashboard" style="color:rgb(241, 236, 236)">
+                <i class="zmdi zmdi-view-dashboard" ></i>Dashboard
             </a>
         </li>
 
-        <li>
-            <a href="addFeed">
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="addFeed" style="color:rgb(241, 236, 236)">
                 <i class="zmdi zmdi-plus"></i>Add News
 
             </a>
         </li>
 
-        <li>
-            <a href="manageFeed">
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="manageFeed" style="color:rgb(241, 236, 236)">
                 <i class="zmdi zmdi-edit"></i>Manage News
 
             </a>
         </li>
 
-        <li>
-            <a href="addquery">
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="addquery" style="color:rgb(241, 236, 236)">
                 <i class="zmdi zmdi-help-outline"></i>Manage Query
 
             </a>
         </li>
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="feedback" style="color:rgb(241, 236, 236)">
+                <i class="zmdi zmdi-view-headline" ></i>FeedBack
+            </a>
+        </li>
 
-        <li>
-            <a href="#" onclick="logout()">
-                <i class="zmdi zmdi-time-restore-setting"></i>Logout
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="#" style="color:rgb(241, 236, 236)" onclick="logout()">
+                <i class="fa fa-sign-out"></i>Logout
 
             </a>
         </li>
         <li>
-            <a href="#">USER:
+            <a href="#">
                 <b>
                     <script>document.write(sessionStorage.getItem("username"));</script> </b></a>
             <br>
@@ -170,37 +236,61 @@
 
 <!-- Public sidebar -->
 <div id="sidebar" class="public-sidebar">
-    <header><a href="#">PEP</a></header>
+    <header><a href="#" style="background-color:rgb(190, 190, 190);font-weight: 700"><span style="color:rgb(63, 60, 60);background-color: transparent;">P </span><span style="color:#1e718a;background-color: transparent;">E </span><span style="color:rgb(63, 60, 60);background-color: transparent;">P</span></a></header>
+    
     <ul class="nav">
-        <li>
-            <a href="dashboard">
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="home"  style="color:rgb(241, 236, 236)">
+                <i class="zmdi zmdi-home"></i>Home
+            </a>
+        </li>
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="dashboard" style="color:rgb(241, 236, 236)">
                 <i class="zmdi zmdi-view-dashboard"></i>Dashboard
             </a>
         </li>
-        <li>
-            <a href="add_complaint">
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="addcomplaint" style="color:rgb(241, 236, 236)">
                 <i class="zmdi zmdi-redo"></i>Complaint
 
 
             </a>
         </li>
-        <li>
-            <a href="polling">
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="upvote" style="color:rgb(241, 236, 236)">
 
                 <i class="zmdi zmdi-thumb-up zmd-fw"></i>Polling
 
             </a>
         </li>
-        <li>
-            <a href="add_answer">
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="addanswer" style="color:rgb(241, 236, 236)">
                 <i class="zmdi zmdi-comment-edit"></i>Answer
 
             </a>
         </li>
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="assembly" style="color:rgb(241, 236, 236)">
 
-        <li>
-            <a href="#" onclick="logout()">
-                <i class="zmdi zmdi-time-restore-setting"></i>Logout
+                <i class="zmdi zmdi-pin"></i>Assembly
+
+            </a>
+        </li>
+        
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="rti" style="color:rgb(241, 236, 236)">
+
+                <i class="fa fa-question-circle"></i>RTI
+
+            </a>
+        </li>
+        
+    
+        <!-- zmdi zmdi-time-restore-setting -->
+
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="#" onclick="logout()" style="color:rgb(241, 236, 236)">
+                <i class="fa fa-sign-out"></i>Logout
 
             </a>
         </li>
@@ -208,36 +298,57 @@
             <a href="#">USER:
                 <b>
                     <script>document.write(sessionStorage.getItem("username"));</script> </b></a>
+            
+            
+                <button type="button" class="btn btn-secondary zmdi zmdi-star" id="myBtn" data-toggle="modal"
+                data-target="#myModal" style="border:2px solid rgb(45, 46, 45)">FeedBack
+                </button>
+
             <br>
-            <br><br><br><br><br>
         </li>
+
     </ul>
+
+
+
+    <br><br><br>
+
 </div>
 
 <!-- Representative sidebar -->
 <div id="sidebar" class="representative-sidebar">
-    <header><a href="#">PEP</a></header>
+    <header><a href="#" style="background-color:rgb(190, 190, 190);font-weight: 700"><span style="color:rgb(63, 60, 60);background-color: transparent;">P </span><span style="color:#1e718a;background-color: transparent;">E </span><span style="color:rgb(63, 60, 60);background-color: transparent;">P</span></a></header>
     <ul class="nav">
-        <li>
-            <a href="dashboard">
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="home" style="color:rgb(241, 236, 236)">
+                <i class="zmdi zmdi-home"></i>Home
+            </a>
+        </li>
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="dashboard" style="color:rgb(241, 236, 236)">
                 <i class="zmdi zmdi-view-dashboard"></i>Dashboard
             </a>
         </li>
 
-        <li>
-            <a href="talk">
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="talk" style="color:rgb(241, 236, 236)">
                 <i class="zmdi zmdi-comment-edit"></i>Q&A
             </a>
         </li>
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="repcomplaint" style="color:rgb(241, 236, 236)">
+                <i class="zmdi zmdi-redo"></i>Complaints
+            </a>
+        </li>
 
-        <li>
-            <a href="#" onclick="logout()">
-                <i class="zmdi zmdi-time-restore-setting"></i>Logout
+        <li style="background-color:rgb(114, 113, 113)">
+            <a href="#" onclick="logout()" style="color:rgb(241, 236, 236)">
+                <i class="fa fa-sign-out"></i>Logout
 
             </a>
         </li>
         <li>
-            <a href="#">USER:
+            <a href="#">
                 <b>
                     <script>document.write(sessionStorage.getItem("username"));</script> </b></a>
             <br>
@@ -245,3 +356,70 @@
         </li>
     </ul>
 </div>
+
+<!-- Modal -->
+ <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+         <!-- Modal content--> 
+        <div class="modal-content">
+         <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title" style="text-align:center;">FEEDBACK</h3><br> 
+                <p>We would love to hear your thoughts, suggestions, concerns or problems with anything so we can 
+                    improve!Please provide your feedback below:</p>
+            </div> 
+            <div class="modal-body"> 
+                 <form id="feedbackform"> {% csrf_token %} 
+
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="sub">Subject</label>
+                            <textarea class="form-control" name="sub" id="sub" placeholder=" subject " rows="2"
+                                cols="20" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="msg">Add a comment</label>
+                            <textarea class="form-control" name="msg" id="msg" placeholder=" comment here... " rows="5"
+                                cols="50" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" class="form-control" pattern="[A-Za-z]{1,15}"
+                                title="Username can only contain 1 to 15 letters"
+                                placeholder="Please enter your name here.. " rows="5" cols="50" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" class="form-control"
+                                placeholder="Please enter your email here..Ex:emailxyz@123"
+                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" rows="5" cols="50" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mobile">Contact Number</label>
+                            <input type="text" id="mobile" name="mobile" class="form-control" placeholder="9898989898"
+                                maxlength="10" minlength="10" required>
+                        </div>
+                    </fieldset>
+                    <div class="modal-footer">
+                        <button type="button" id="submitfeedback" class="btn btn-success" data-dismiss="modal"
+                            onclick="feedback()">Submit FeedBack</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+
+                </form> 
+
+
+
+
+             </div>
+
+
+        </div> 
+
+     </div>
+ </div>  

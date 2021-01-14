@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+{% load static%}
+
+<head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <title>Q&A</title>
+    <link rel="icon" href="{%static 'img/p.jpg'%}" type="image/x-icon">
+    <style>
+        .header {
+
+            padding: 10px 16px;
+            background: #37474F;
+            color: #0e0b0b;
+
+        }
+
+        .sticky {
+
+            position: fixed;
+            top: 0;
+            width: 100%;
+
+        }
+
+        .sticky+.content {
+            padding-top: 102px;
+        }
+    </style>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet'
+        type='text/css'>
+    <link
+        href='https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css'
+        rel='stylesheet' type='text/css'>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+    <div id="viewport">
+        {% include "appdb/navbar.html" %}
+        <!-- Content -->
+        <div id="content" class="container">
+
+
+
+
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+                        <h2 class='title'><b><span style="color:#1e718a;">Q&A </span></b></h2>
+
+                    </div>
+                    <div id="qna">
+                        <div class="jumbotron">
+                            <label>Query:</label><br>
+                            <p>what is democracy?</p></span>
+                            <hr>
+                            <div>
+                                <label>Answers:</label><br>
+                                <article>democracy is democracy</article>
+                                <label>Answered by:<span style="padding-left:20px"></span></label>
+                                <spanstyle="padding-left:60px">shreyu</span><br>
+                                    <article>democracy is democracy</article>
+                                    <label>Answered by:<span style="padding-left:20px"></span></label>
+                                    <spanstyle="padding-left:60px">shreyu</span><br>
+                                        <article>democracy is democracy</article>
+                                        <label>Answered by:<span style="padding-left:20px"></span></label>
+                                        <spanstyle="padding-left:60px">shreyu</span><br>
+                                            <article>democracy is democracy</article>
+                                            <label>Answered by:<span style="padding-left:20px"></span></label>
+                                            <spanstyle="padding-left:60px">shreyu</span><br>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+</body>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+
+    window.onscroll = function () { myFunction() };
+
+    var header = document.getElementById("myHeader");
+    var sticky = header.offsetTop;
+
+    function myFunction() {
+        if (window.pageYOffset > sticky) {
+            header.classList.add("sticky");
+        } else {
+            header.classList.remove("sticky");
+        }
+    }
+
+    $(document).ready(function () {
+        console.log(sessionStorage.getItem("const_id"))
+        getallqna(sessionStorage.getItem("const_id"));
+    })
+    function getallqna(const_id) {
+
+        $.ajax({
+            url: "/getallqna?const_id=" + const_id,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'GET',
+            beforeSend: function () { },
+            success: function (response) {
+                console.log("responseData------>", response);
+                if (response['code'] == 200) {
+                    var qdata = response['qdata'];
+                    var adata = response['adata'];
+                    var qAdata = [];
+                    qdata.forEach(function (q) {
+                        var queries = {
+                            'id': q['id'],
+                            'query': q['query']
+                        }
+                        var answers = [];
+                        adata.forEach(function (a) {
+                            if (a['query_id'] == q['id']) {
+                                answers.push(a);
+                            }
+                        })
+                        var data = { 'query': queries, 'answer': answers };
+                        qAdata.push(data);
+                    })
+                    console.log("finalData----->", qAdata);
+
+                    // append to #qna
+                    if (qAdata.length != 0) {
+                        var data = "";
+                        qAdata.forEach(function (qna) {
+                            data += '<div class="jumbotron"><label>Query:</label><br><p>' + qna.query.query + '</p></span><hr><div>';
+
+                            if (qna.answer.length != 0) {
+                                data += '<label>Answers:</label><br>';
+                                qna.answer.forEach(function (answer) {
+                                    data += '<article>' + answer.answer + '</article>' +
+                                        '<label>Answered by:<span style="padding-left:20px"></span></label><spanstyle="padding-left:60px">' + answer.answered_by_name + '</span><br><br>';
+                                })
+                            }
+                            else{
+                                data += '<article>Nobody answered yet...</article>';
+                            }
+                            data += '</div></div>';
+                        })
+                        $('#qna').html(data);
+                    }
+                }
+                else if (response['code'] == 400) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+
+            },
+            error: function (error) {
+            }
+        })
+    }
+</script>

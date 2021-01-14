@@ -1,5 +1,5 @@
 from django.contrib import admin
-from appdb.models import Constituency,User,News_Feed,Sector,Complaint,Query,Answer
+from appdb.models import Constituency,User,News_Feed,Sector,Complaint,Query,Answer,Feedback,Assembly
 
 # Register your models here.
 @admin.register(Constituency)
@@ -33,3 +33,11 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Answer)
 class UserAdmin(admin.ModelAdmin):
     list_display=['answer','query','date','answered_by_name']
+
+@admin.register(Feedback)
+class UserAdmin(admin.ModelAdmin):
+    list_display=['name','email','contactno','subject','message','recdate']
+
+@admin.register(Assembly)
+class UserAdmin(admin.ModelAdmin):
+    list_display=['c_id','c_name','latitude','longitude','data']

@@ -1,6 +1,13 @@
-<html>
+<!DOCTYPE html>
+{% load static%}
 
 <head>
+    <title>ManageQuery</title>
+    <link rel="icon" href="{%static 'img/p.jpg'%}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
@@ -14,7 +21,37 @@
                 <div class="row">
                     <div class="col-md-12 card well card-body bg-light header" id="myHeader"
                         style="background-color:#eee;">
-                        <h2 class='title'><b></p>TALK</b></h2>
+                        <div class="modal fade" id="editQueryModal" role="dialog">
+                            <div class="modal-dialog">
+
+                                <!-- Modal content-->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Edit News</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="editquery">
+                                            <input type="text" id="editqueryId" hidden>
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label>Queries</label>
+                                                <textarea class="form-control" name="query" id="edit_query_title"
+                                                    placeholder="Your question.." rows="2" cols="40"></textarea>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" id="editqueryBtn" onclick="editQuery()"
+                                            class="btn btn-info pull-right">Save
+                                            changes</button>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <h2 class='title'><b><span style="color:#1e718a;">Query </span></b></h2>
                     </div>
                     <form id="query">{% csrf_token %}
                         <div class="jumbotron">
@@ -23,14 +60,17 @@
                                 <div class="md-form">
                                     <label>Question</label>
                                     <textarea class="md-textarea form-control" name="query"
-                                        placeholder="Your question...."></textarea>
+                                        placeholder="Your question...."
+                                        style="border:2px double rgb(125, 177, 132)"></textarea>
                                 </div>
                             </div>
 
                             <br><br>
                             <div class="row">
                                 <div class="col-xs-4">
-                                    <button type="submit" class="btn btn-success">Submit</button></div>
+                                    <button type="submit" class="btn btn-success" style="margin-left:800px"
+                                        ;>Submit</button>
+                                </div>
                             </div>
                             <br><br>
                             <div id="queryadded" class="alert alert-success alert-dismissible" hidden>
@@ -43,10 +83,9 @@
         </div>
         <div id="content" class="container">
             <div class="col-md-12 card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
-                <h2 class='title'><b></p>QUERIES</b></h2>
+                <h2 class='title'><b><span style="color:#1e718a;">Queries </span></b></h2>
             </div>
             <div id="added_queries" class="content">
-
             </div>
         </div>
     </div>
@@ -75,11 +114,13 @@
             type: 'GET',
             beforeSend: function () { },
             success: function (response) {
-                console.log(response, response.data);
-                var queryData = response.data;
+                console.log(response.data);
+                queryData = response.data;
                 var data = "";
+
                 queryData.forEach(function (query) {
-                    data += '<div id="query' + query.id + '" class="jumbotron"><small><b>' + query.date + '</b></small>' +
+                    var date = new Date(query.date);
+                    data += '<div id="query' + query.id + '" class="jumbotron"><small><b>' + date.toLocaleString('en-IN') + '</b></small>' +
                         '<hr><large id="querydesc' + query.id + '"><b>' + query.query + '</b></large><br><br>' +
                         '<div class="btn-group"><button type="button" data-toggle="modal" data-target="#editQueryModal" onclick="openEditquery(' + query.id + ')" class="btn btn-success">Edit</button>' +
                         '<button onclick="deleteQuery(' + query.id + ')" type="submit" class="btn btn-danger">Delete</button></div></div>';
@@ -117,6 +158,21 @@
                     $("#query_msg").html(response['message'])
                     $("#queryadded").show()
 
+                    var query_id = response['query_id'];
+                    var query_date = response['query_date'];
+                    var query = response['query'];
+                    var posted_by_name = response['posted_by_name']
+                    var data = "";
+
+                    data += '<div id="query' + query_id + '" class="jumbotron"><small><b>' + query_date + '</b></small>' +
+                        '<hr><large id="querydesc' + query_id + '"><b>' + query + '</b></large><br><br>' +
+                        '<div class="btn-group"><button type="button" data-toggle="modal" data-target="#editQueryModal" onclick="openEditquery(' + query_id + ')" class="btn btn-success">Edit</button>' +
+                        '<button onclick="deleteQuery(' + query_id + ')" type="submit" class="btn btn-danger">Delete</button></div></div>';
+                    $('#added_queries').append(data);
+
+                    // add into queryData
+                    queryData.push({ "id": query_id, "date": query_date, "posted_by_name": posted_by_name, "qconst_id": response['qconst_id'], 'query': query });
+
                 } else if (response['code'] == 400) {
                     Swal.fire({
                         title: 'Error!',
@@ -146,6 +202,126 @@
         })
     });
 
+    //delete query
+    function deleteQuery(queryid) {
+        var data = new FormData();
+        data.append('query_id', queryid);
+        $.ajax({
+            url: "/deletequery",
+            cache: false,
+            data: data,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            beforeSend: function () { },
+            success: function (response) {
+                if (response['code'] == 200) {
+                    $("#query" + queryid).remove()
+                    Swal.fire({
+
+                        text: response['message'],
+                        icon: 'warning',
+                        confirmButtonText: 'Save Changes',
+
+                    })
+                }
+
+                else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+            },
+            error: function (error) {
+            }
+        })
+    }
+
+    //open edit query
+    function openEditquery(queryid) {
+        console.log(queryid)
+        $("textarea#edit_query_title").val("");
+        queryData.forEach(function (qry) {
+            if (qry['id'] == queryid) {
+                $("#editqueryId").val(queryid);
+                $("textarea#edit_query_title").val(qry['query']);
+            }
+        });
+
+    }
+
+
+    //edit query
+    function editQuery() {
+        //get form data
+        console.log($('#editqueryId').val())
+        var form = document.getElementById('editquery');
+        var formData = new FormData(form);
+        formData.append('query_id', $('#editqueryId').val());
+        $.ajax({
+            url: "editquery",
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            beforeSend: function () { },
+            success: function (response) {
+                if (response['code'] == 200) {
+                    $('#editQueryModal').hide();
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                    $("#querydesc" + response['query_id']).html("<b>" + response['updatedquery'] + "</b>");
+
+
+                    queryData.forEach(function (qrey) {
+                        if (qrey['id'] == $('#editqueryId').val()) {
+                            qrey['query'] = response['updatedquery'];
+
+                        }
+                    });
+
+                    Swal.fire({
+                        title: 'Success!',
+                        text: response['message'],
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    })
+
+                } else if (response['code'] == 400) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+            },
+            error: function (error) {
+                Swal.fire({
+                    title: 'oops!',
+                    text: "Something went wrong . Try again!!!",
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                })
+            }
+        })
+
+
+
+
+
+    }
 
 
 </script>

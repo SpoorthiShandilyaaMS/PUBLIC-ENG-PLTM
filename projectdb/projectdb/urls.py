@@ -16,10 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path
 from appdb import views
+from django.conf.urls.static import static
+from django.conf  import settings
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('',views.home_view,name='homeview'),
+    path('admin', admin.site.urls),
+    path('home',views.home_view,name='homeview'),
+    path('aboutus',views.aboutus_view,name='aboutus'),
+    path('contact',views.contact_view,name='contact'),
     path('signup',views.get_signup_data,name='signup'),
     path('login',views.login,name='login'),
     path('addFeed',views.add_feed,name='addfeed'),
@@ -29,10 +34,25 @@ urlpatterns = [
     path('deleteFeed',views.delete_feed,name='deleteFeed'),
     path('addcomplaint',views.add_complaint,name='addcomplaint'),
     path('getallcomplaints',views.get_all_complaints,name='getallcomplaints'),
+    path('complaint',views.get_all_complaints,name='complaint'),
+    path('repcomplaint',views.repcomplaints,name='complaint'),
     path('addquery',views.add_query,name='addquery'),
     path('getallqueries',views.get_all_queries,name='getallqueries'),
+    path('deletequery',views.delete_query,name='deletequery'),
+    path('editquery',views.edit_query,name='editquery'),
     path('upvote',views.upvote,name='upvote'),
     path('addanswer',views.add_answer,name='addanswer'),
-    path('dashboard',views.dashboard,name='dashboard')
+    path('dashboard',views.dashboard,name='dashboard'),
+    path('feedback',views.feedback,name='feedback'),
+    path('getallfeedback',views.get_all_feedbacks,name='getallfeedback'),
+    path('talk',views.talk,name='talk'),
+    path('getallqna',views.getqna,name='getqna'),
+    path('getassembly',views.getassembly,name='getassembly'),
+    path('assembly',views.assembly,name='assembly'),
+    path('rti',views.getrti,name='rti'),
+
+   
 
 ]
+
+urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

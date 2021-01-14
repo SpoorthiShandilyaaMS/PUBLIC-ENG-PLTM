@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+{% load static%}
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <title>Complaint</title>
+        <link rel = "icon" href ="{%static 'img/p.jpg'%}"
+          type = "image/x-icon"> 
+    <style>
+        #photo {
+
+            border: 2px double rgb(125, 177, 132);
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            padding: 10px 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="viewport">
+        {% include "appdb/navbar.html" %}
+        <div id="content" class="container">
+            <div class="container-fluid">
+                <form id="complaints" method="post">{% csrf_token %}
+                    <div class="row">
+                        <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+                            <h2 class="title"><b><span style="color:#1e718a;">Complaint </span></b></h2>
+                            
+                        </div>
+
+                        <div class="jumbotron">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Select a Sector</label>
+                                    <select class="form-control" name="sector_name"
+                                        style="border:2px double rgb(125, 177, 132)">
+                                        <option value="Power">Power</option>
+                                        <option value="Water">Water</option>
+                                        <option value="Security">Security</option>
+                                        <option value="Transportation">Transportation</option>
+                                        <option value="Infrastructure">Infrastructure</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <hr><br>
+
+                            <div class="row">
+                                <div class="file-field">
+                                    <div class="col-md-6">
+                                        <label>Choose file to upload</label>
+                                        <input type="file" id="photo" name="complaint_image" style=" border:2px double rgb(125, 177,
+                                            132)">
+                                    </div>
+
+                                </div>
+                            </div>
+                            <hr><br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Complaint Subject</label>
+                                    <textarea class="form-control" name="complaint_subject"
+                                        placeholder="Complaint Subject here.."
+                                        style="border:2px double rgb(125, 177, 132)"></textarea>
+                                </div>
+                            </div>
+                            <hr><br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Complaint Description</label>
+                                    <textarea class="form-control" name="complaint_details"
+                                        placeholder="Write your complaint here.." rows="7" cols="60"
+                                        style="border:2px double rgb(125, 177, 132)"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success pull-right">POST</button>
+                            <div class="clearfix"></div>
+                            <div id="addedcomp" class="alert alert-success alert-dismissible" hidden>
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong id="added_comp"></strong>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        </form>
+    </div>
+    </div>
+</body>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    $(".close").click(function () {
+        $("#addedcomp").hide()
+    })
+    // on submit of add complaint form
+    $(document).on('submit', '#complaints', function (e) {
+        e.preventDefault();
+        //get form data
+        var form = document.getElementById('complaints');
+        var formData = new FormData(form);
+        formData.append('constituency_name', sessionStorage.getItem('uconsname'));
+        formData.append('posted_by_name', sessionStorage.getItem('username'));
+        $.ajax({
+            url: "/addcomplaint",
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            beforeSend: function () { },
+            success: function (response) {
+                if (response['code'] == 200) {
+                    document.getElementById("complaints").reset();
+                    Swal.fire({
+                        title: 'ok!',
+                        text: response['message'],
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    })
+                } else if (response['code'] == 400) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+            },
+            error: function (error) {
+                Swal.fire({
+                    title: 'oops!',
+                    text: "Something went wrong . Try again!!!",
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                })
+            }
+        })
+    });
+</script>

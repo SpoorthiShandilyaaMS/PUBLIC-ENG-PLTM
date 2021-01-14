@@ -13,12 +13,12 @@ class Constituency(models.Model):
 
 class User(models.Model):
     const=models.ForeignKey(Constituency,on_delete=models.CASCADE)
-    username=models.CharField(max_length=20,null=False,unique=True)
+    username=models.CharField(max_length=40,null=False,unique=True)
     uemail=models.EmailField(primary_key=True,null=False)
     upassword=models.CharField(max_length=20,null=False)
     umobile=models.CharField(max_length=10,null=True,blank=True)
     uconsname=models.CharField(max_length=20,default='Basavangudi')
-    usertype=models.CharField(max_length=10,null=True)
+    usertype=models.CharField(max_length=20,null=True)
 
 
 
@@ -29,6 +29,7 @@ class News_Feed(models.Model):
     feed_date=models.DateTimeField(auto_now=True,null=True,blank=True)
     constituency_name=models.CharField(max_length=20,null=False)
     constituency=models.ForeignKey(Constituency,on_delete=models.CASCADE)
+    newsimage = models.ImageField(null=True,blank=True,upload_to="img/")
 
 
 
@@ -45,11 +46,12 @@ class Complaint(models.Model):
     complaint_details=models.CharField(max_length=300,null=False)
     posted_by_name = models.CharField(max_length=50,null=False)
     const=models.ForeignKey(Constituency,on_delete=models.CASCADE)
-    no_up_vote=models.IntegerField(null=True)
+    no_up_vote=models.IntegerField(default=0)
     sector=models.ForeignKey(Sector,on_delete=models.CASCADE)
     sector_name=models.CharField(max_length=30,null=False)
     const_name=models.CharField(max_length=50,null=False)
     upvoted_by=models.CharField(max_length=50,null=True)
+    complaintimage = models.ImageField(null=True,blank=True,upload_to="img/")
 
 
 
@@ -66,3 +68,21 @@ class Answer(models.Model):
     query =models.ForeignKey(Query,on_delete=models.CASCADE)
     answered_by_name = models.CharField(max_length=50,null=False)
     date=models.DateTimeField(auto_now=True,null=True,blank=True)
+
+class Feedback(models.Model):
+    subject=models.CharField(max_length=20)
+    message=models.CharField(max_length=100)
+    name=models.CharField(max_length=20)
+    email=models.EmailField()
+    recdate=models.DateTimeField(auto_now_add=True,null=True,blank=True)
+    contactno=models.CharField(max_length=10)
+    qcons=models.ForeignKey(Constituency,on_delete=models.CASCADE,default=100)
+    qcons_name=models.CharField(max_length=50,null=False,default='Basavangudi')
+    
+class Assembly(models.Model):
+    c_id=models.IntegerField()
+    c_name=models.CharField(max_length=20)
+    latitude=models.DecimalField(max_digits=30, decimal_places=15)
+    longitude=models.DecimalField(max_digits=30, decimal_places=15)
+    data=models.CharField(max_length=2000)
+     

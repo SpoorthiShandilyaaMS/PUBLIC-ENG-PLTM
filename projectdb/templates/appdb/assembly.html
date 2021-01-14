@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+{%load static%}
+
+<head>
+
+    <title>Assembly</title>
+    <link rel = "icon" href ="{%static 'img/p.jpg'%}"
+          type = "image/x-icon"> 
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  
+</head>
+<style>
+    .sticky {
+
+        position: fixed;
+        top: 0;
+        width: 100%;
+
+    }
+
+    .sticky+.content {
+        padding-top: 102px;
+    }
+
+    
+
+    /* Set the size of the div element that contains the map */
+    #map {
+        height: 400px;
+        /* The height is 400 pixels */
+        width: 100%;
+        /* The width is the width of the web page */
+    }
+</style>
+
+<body>
+    <div id="viewport">
+        {% include "appdb/navbar.html" %}
+        <div id="content" class="container">
+            <div class="container-fluid ">
+                <div class="row">
+                    <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+                        <h2 class='title'><b><span style="color:#1e718a;">Assembly </span></b></h2>
+                    </div>
+
+                </div>
+                <div id="map">
+                    <!-- <div>
+                        <iframe width="600" height="450" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBHdHAb9T-zvbb_qJAHjblgrgL6HOZ-SY8&q=Basavangudi
+                        
+                        &center=12.94129083578511, 77.57368772543555
+                        &zoom=18
+                        &maptype=satellite" allowfullscreen>
+                        </iframe>
+                    </div><br><br><br>
+                    <div>
+                        <h2 id="title">T</h2><br>
+                        <p id="desc">Desc</p>
+                    </div> -->
+                </div>
+
+            </div>
+        </div>
+
+
+</body>
+
+<script>
+    $(document).ready(function () {
+        getAssembly(sessionStorage.getItem("uconsname"));
+    })
+    function getAssembly(const_name) {
+        $.ajax({
+            url: "/getassembly?const_name=" + const_name,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'GET',
+            beforeSend: function () { },
+            success: function (response) {
+                var data = '';
+
+                data += '<div class="container"><iframe width = "600" height = "450" frameborder = "0" style = "border:0" src = "https://www.google.com/maps/embed/v1/place?key=AIzaSyBHdHAb9T-zvbb_qJAHjblgrgL6HOZ-SY8&q=' + const_name+'&center='+response.data[0].latitude+','+response.data[0].longitude+'&zoom=18&maptype=satellite" allowfullscreen></iframe ></div > <br><div><h2 id="title">' + response.data[0].c_name + '</h2><br><article id="desc">' + response.data[0].data + '</article></div>';
+
+                $('#map').html(data);
+
+            },
+
+            error: function (error) {
+            }
+        })
+    }
+  
+    window.onscroll = function () { myFunction() };
+
+var header = document.getElementById("myHeader");
+var sticky = header.offsetTop;
+
+function myFunction() {
+    if (window.pageYOffset > sticky) {
+        header.classList.add("sticky");
+    } else {
+        header.classList.remove("sticky");
+    }
+}
+
+</script>
+
+</html>

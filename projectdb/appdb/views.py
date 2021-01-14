@@ -6,6 +6,8 @@ from appdb.models import Complaint
 from appdb.models import Sector
 from appdb.models import Query
 from appdb.models import Answer
+from appdb.models import Feedback
+from appdb.models import Assembly
 from django.http import HttpResponse
 import re
 from django.core.validators import RegexValidator
@@ -22,12 +24,77 @@ from django.forms.models import model_to_dict
 import json
 from django.utils import timezone
 import logging
+from itertools import chain
 
 
 # function for homepage view
+@csrf_exempt
 def home_view(request):
 
     return render(request, 'appdb/home.html')
+
+
+@csrf_exempt
+def aboutus_view(request):
+
+    return render(request, 'appdb/aboutus.html')
+
+@csrf_exempt
+def contact_view(request):
+
+    return render(request, 'appdb/contact_us.html')
+
+
+@csrf_exempt
+def getrti(request):
+
+    return render(request, 'appdb/rti.html')
+
+
+@csrf_exempt
+def getassembly(request):
+    if request.method=='GET':
+        cons_name = request.GET.get('const_name')
+
+        if(cons_name):
+            try:
+                if Assembly.objects.filter(c_name = cons_name).exists():
+                    userData = Assembly.objects.filter(c_name = cons_name).values('id','c_id','c_name','latitude','longitude','data')
+                    responseData ={
+                    'code' : 200,
+                    'msg' : 'successfully assembly shown',
+                    'data' : list(userData),
+                    }
+                    return JsonResponse(responseData, safe=False)
+                else:
+                    responseData ={
+                    'code' : 400,
+                    'msg' : 'No assembly to show'
+                    }
+                    return JsonResponse(responseData, safe=False)
+
+            except Exception as e:
+                responseData = {
+                    'code': 500,
+                    'message': 'Something went wrong!!',
+                }
+                return JsonResponse(responseData, safe=False)
+
+        else:
+            responseData ={
+            'code' : 400,
+            'msg' : 'Specify Constituency name'
+            }
+            return JsonResponse(responseData, safe=False)
+
+
+
+@csrf_exempt
+def assembly(request):
+    return render(request, 'appdb/assembly.html')
+
+
+    
 
 
 
@@ -104,17 +171,21 @@ def get_signup_data(request):
 def login(request):
     if request.method =='POST':
         email = request.POST.get('user_email')
+        # uname = request.POST.get('user_name')
         pwd = request.POST.get('user_password')
+       
 
 
         # if email and pwd not null
-        if(email and pwd):
-            #if user email exists
+        if((email or uname) and pwd):
+            
             try:
-                if User.objects.filter(uemail=email).exists():
+                #if user email exists
+                if User.objects.filter(uemail=email).exists() | User.objects.filter(username=email).exists():
+                   
                     # if useremail exists and the password matches
-                    if User.objects.filter(uemail=email).filter(upassword=pwd).exists():
-                        userData = User.objects.filter(uemail=email).values('uemail','uconsname','const_id','username','usertype')
+                    if User.objects.filter(uemail=email).filter(upassword=pwd).exists() | User.objects.filter(username=email).filter(upassword=pwd).exists():
+                        userData = User.objects.filter(uemail=email).values('uemail','uconsname','const_id','username','usertype') |  User.objects.filter(username=email).values('uemail','uconsname','const_id','username','usertype')
                         responseData={
                             'code': 200,
                             'message': 'login Successful',
@@ -130,9 +201,10 @@ def login(request):
                     # the given email doesnt exists
                     responseData = {
                         'code': 400,
-                        'message': 'No user with '+email+' exists.Check email entered!!',
+                        'message': 'No user with '+email+' exists.Check email or name entered!!or Kindly Register first',
                     }
-                return JsonResponse(responseData, safe=False)
+                    return JsonResponse(responseData, safe=False)
+            
             except:
                 # log the exceptions
                 responseData = {
@@ -158,19 +230,29 @@ def dashboard(request):
 
 
 @csrf_exempt
+def getfeedback(request):
+    if request.method =='GET':
+        return render(request,'appdb/getfeedback.html')
+
+@csrf_exempt
 def add_feed(request):
     if request.method=='POST':
         newstitle = request.POST.get('news_title')
         newsdesc = request.POST.get('news_description')
         constituencyname = request.POST.get('constituency_name')
+        if(request.FILES.get('news_image')):
+            pic = request.FILES['news_image']
+        else:
+            pic = ""
 
         if(newstitle and newsdesc and constituencyname):
+            
 
 
             const_id = get_object_or_404(Constituency,constituency_name=constituencyname).constituency
-            # return HttpResponse(const_id)
+            
             try:
-                reg = News_Feed(feed_title=newstitle,feed_description=newsdesc,constituency_name=constituencyname,constituency_id=const_id)
+                reg = News_Feed(feed_title=newstitle,feed_description=newsdesc,constituency_name=constituencyname,constituency_id=const_id,newsimage=pic)
                 regstatus = reg.save()
                 responseData = {
                     'code': 200,
@@ -178,10 +260,10 @@ def add_feed(request):
                     }
                 return JsonResponse(responseData)
 
-            except Exception:
+            except Exception as e:
                 responseData = {
                     'code': 500,
-                    'message': 'something went wrong!!',
+                    'message': 'something went wrong!!'+str(e),
                 }
                 return JsonResponse(responseData)
         else:
@@ -211,7 +293,7 @@ def get_all_feeds(request):
         if(const_id):
             try:
                 if News_Feed.objects.filter(constituency_id = const_id).exists():
-                    userData = News_Feed.objects.filter(constituency_id = const_id).order_by('-id').values('id','constituency_name','feed_title','feed_description','feed_date')
+                    userData = News_Feed.objects.filter(constituency_id = const_id).order_by('-id').values('id','constituency_name','feed_title','feed_description','feed_date','newsimage')
                     responseData ={
                     'code' : 200,
                     'msg' : 'successfully news shown',
@@ -249,11 +331,10 @@ def edit_feed(request):
         feedid = request.POST.get('feed_id')
         newstitle = request.POST.get('news_title')
         newsdesc = request.POST.get('news_description')
-
-
-
+       
 
         if(newstitle and newsdesc and feedid):
+            
 
             try:
                 updateRes = News_Feed.objects.filter(id=feedid).update(feed_title=newstitle,feed_description=newsdesc)
@@ -334,6 +415,10 @@ def add_complaint(request):
         sectorname =  request.POST.get('sector_name')
         constname = request.POST.get('constituency_name')
         postedbyname =  request.POST.get('posted_by_name')
+        if(request.FILES.get('complaint_image')):
+            img = request.FILES['complaint_image']
+        else:
+            img = ""
 
         if(compsub and compdetails and sectorname and postedbyname and constname):
 
@@ -342,7 +427,7 @@ def add_complaint(request):
             const_id = get_object_or_404(Constituency,constituency_name=constname).constituency
 
             try:
-                reg = Complaint(complaint_subject=compsub,complaint_details=compdetails,posted_by_name=postedbyname,const_id=const_id,const_name=constname,sector_name=sectorname,sector_id=sectorid)
+                reg = Complaint(complaint_subject=compsub,complaint_details=compdetails,posted_by_name=postedbyname,const_id=const_id,const_name=constname,sector_name=sectorname,sector_id=sectorid,complaintimage=img)
                 regstatus = reg.save()
                 responseData = {
                     'code': 200,
@@ -364,6 +449,8 @@ def add_complaint(request):
                 'message': 'Enter all complaint feilds',
             }
             return JsonResponse(responseData)
+    else:
+        return render(request,'appdb/add_complaint.html') 
 
 
 @csrf_exempt
@@ -386,8 +473,8 @@ def upvote(request):
                     upvotedusers = upvotedby.split('~')
                     if username in upvotedusers:
                         responseData = {
-                            'code': 200,
-                            'message': 'This user has already upvoted the isuue..'
+                            'code': 201,
+                            'message': 'You have already upvoted this issue..'
                         }
                         return JsonResponse(responseData)
 
@@ -397,7 +484,8 @@ def upvote(request):
                 if upvoted:
                     responseData = {
                         'code': 200,
-                        'message': 'Successfully upvoted'
+                        'message': 'Successfully upvoted',
+                        'no_up_vote' : noofupvotes+1
                     }
                     return JsonResponse(responseData)
 
@@ -416,6 +504,8 @@ def upvote(request):
                 'message': 'Enter all details(complaint id and username)',
             }
             return JsonResponse(responseData)
+    else:
+        return render(request,'appdb/poll.html') 
 
 @csrf_exempt
 def get_all_complaints(request):
@@ -425,7 +515,7 @@ def get_all_complaints(request):
         if(const_id):
             try:
                 if Complaint.objects.filter(const_id = const_id).exists():
-                    complaintData = Complaint.objects.filter(const_id = const_id).order_by('id').values('id','complaint_subject','complaint_details','const','sector','sector_name','posted_by_name','const_name','upvoted_by','no_up_vote')
+                    complaintData = Complaint.objects.filter(const_id = const_id).order_by('-id').values('id','complaint_subject','complaint_details','const','sector','sector_name','posted_by_name','const_name','upvoted_by','no_up_vote','complaintimage')
                     responseData ={
                     'code' : 200,
                     'msg' : 'successfully complaints shown',
@@ -453,6 +543,99 @@ def get_all_complaints(request):
             }
             return JsonResponse(responseData, safe=False)
 
+
+@csrf_exempt
+def repcomplaints(request):
+    return render(request,'appdb/repshowcomplaints.html')
+
+@csrf_exempt
+def feedback(request):
+    if request.method=="POST":
+        subject = request.POST.get('sub')
+        msg = request.POST.get('msg')
+        username = request.POST.get('name')
+        useremail = request.POST.get('email')
+        usermobile = request.POST.get('mobile')
+        constituencyname = request.POST.get('qcons_name')
+
+        # name=re.fullmatch('[A-Za-z]{1,15}',username)
+        # email=re.fullmatch('[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$',useremail)
+        # mobile=re.fullmatch('[789]\d{9}$',usermobile)
+        # if name:
+        #     username=name
+        # if email:
+        #     useremail=email
+        # if mobile:
+        #     usermobile=mobile
+        # return HttpResponse(name)
+
+        if(subject and msg and username and  useremail and usermobile and constituencyname):
+            const_id = get_object_or_404(Constituency,constituency_name=constituencyname).constituency
+          
+            try:
+                reg = Feedback(subject=subject,message=msg,name=username,email=useremail,contactno=usermobile,qcons_id=const_id,qcons_name=constituencyname)
+                regstatus = reg.save()
+                responseData = {
+                    'code': 200,
+                    'message': 'Thanks For The FeedBack',
+                    }
+                return JsonResponse(responseData)
+            except Exception as e:
+                responseData = {
+                    'code': 500,
+                    'message': 'something went wrong!!'+str(e),
+                }
+                return JsonResponse(responseData)
+        else:
+            responseData = {
+                'code': 400,
+                'message': 'Please Enter proper details!!',
+            }
+            return JsonResponse(responseData)
+    else:
+        return render(request,'appdb/getfeedback.html')
+     
+
+
+@csrf_exempt
+def get_all_feedbacks(request):
+    if request.method == 'GET':
+        const_id=request.GET['const_id']
+
+        if(const_id):
+            try:
+                if Feedback.objects.filter(qcons_id = const_id).exists():
+                    userData = Feedback.objects.filter(qcons_id = const_id).order_by('-id').values('id','qcons_name','subject','message','name','email','contactno','recdate')
+                    responseData ={
+                    'code' : 200,
+                    'msg' : 'successfully feedbacks shown',
+                    'data' : list(userData),
+                    }
+                    return JsonResponse(responseData, safe=False)
+                else:
+                    responseData ={
+                    'code' : 400,
+                    'msg' : 'No feedback to show'
+                    }
+                    return JsonResponse(responseData, safe=False)
+
+            except Exception as e:
+                responseData = {
+                    'code': 500,
+                    'message': 'Something went wrong!!',
+                }
+                return JsonResponse(responseData, safe=False)
+
+        else:
+            responseData ={
+            'code' : 400,
+            'msg' : 'Specify Constituency ID'
+            }
+            return JsonResponse(responseData, safe=False)
+
+
+
+
 @csrf_exempt
 def add_query(request):
     if request.method=='POST':
@@ -470,6 +653,11 @@ def add_query(request):
                 responseData = {
                     'code': 200,
                     'message': 'Successfully added query',
+                    'query_id' : reg.id,
+                    'query_date' : reg.date,
+                    'query' : reg.query,
+                    'posted_by_name' : reg.posted_by_name,
+                    'qconst_id' : const_id
                     }
                 return JsonResponse(responseData)
 
@@ -500,7 +688,7 @@ def get_all_queries(request):
             try:
                 if Query.objects.filter(qconst_id = const_id).exists():
                     userData = Query.objects.filter(qconst_id = const_id).order_by('id').values('id','query','posted_by_name','qconst_id','qconst_name','date','answered_by')
-
+                     
                     responseData ={
                     'code' : 200,
                     'msg' : 'successfully queries shown',
@@ -527,6 +715,78 @@ def get_all_queries(request):
             'msg' : 'Specify Constituency ID'
             }
             return JsonResponse(responseData, safe=False)
+
+@csrf_exempt
+def delete_query(request):
+    if request.method=='POST':
+        queryid = request.POST.get('query_id')
+
+        if(queryid):
+            try:
+                if Query.objects.filter(id=queryid).exists():
+                    delres = Query.objects.filter(id=queryid).delete()
+
+                    responseData = {
+                    'code': 200,
+                    'feed_id':queryid,
+                    'message': 'Successfully deleted query',
+                    }
+                    return JsonResponse(responseData)
+                else:
+                    responseData = {
+                    'code': 400,
+                    'message': 'No query with id '+queryid,
+                    }
+                    return JsonResponse(responseData)
+
+
+            except Exception as e:
+                responseData = {
+                    'code': 500,
+                    'message': str(e),
+                }
+                return JsonResponse(responseData)
+
+        else:
+            responseData = {
+                'code': 400,
+                'message': 'Please provide query id!!',
+            }
+            return JsonResponse(responseData)
+
+
+@csrf_exempt
+def edit_query(request):
+    if request.method=='POST':
+        queryid = request.POST.get('query_id')
+        updtquery = request.POST.get('query')
+        
+        if(queryid and updtquery):
+            try:
+                updateRes = Query.objects.filter(id=queryid).update(query=updtquery)
+
+                responseData = {
+                    'code': 200,
+                    'query_id':queryid,
+                    'updatedquery':updtquery,
+                    'message': 'Successfully edited query',
+                    }
+                return JsonResponse(responseData)
+
+            except Exception as e :
+                responseData = {
+                    'code': 500,
+                    'message': str(e),
+                }
+                return JsonResponse(responseData)
+        else:
+            responseData = {
+                'code': 400,
+                'message': 'Please provide proper Query details!!',
+            }
+            return JsonResponse(responseData)
+
+
 
 @csrf_exempt
 def add_answer(request):
@@ -578,3 +838,58 @@ def add_answer(request):
                 'message': 'Please Enter proper fields!!',
             }
             return JsonResponse(responseData)
+    else:
+        return render(request,"appdb/answer.html")
+
+
+@csrf_exempt
+def talk(request):
+    if request.method=='GET':
+        return render(request,"appdb/qna.html")
+        
+
+@csrf_exempt
+def getqna(request):
+    if request.method=='GET':
+        
+        const_id=request.GET.get('const_id')
+      
+        if(const_id):
+            try:
+                # return HttpResponse(request.GET.get('const_id'))
+                if Query.objects.filter(qconst_id = const_id).exists():
+                    querylist=Query.objects.filter(qconst_id = const_id).order_by('-id').values('id','query','qconst_name','answered_by')
+                    answerlist=Answer.objects.values('id','answer','answered_by_name','query_id')
+
+                    responseData ={
+                    'code' : 200,
+                    'msg' : 'successfully QnA shown',
+                    'qdata' : list(querylist),
+                    'adata' : list(answerlist),
+                    }
+                    return JsonResponse(responseData, safe=False)
+                else:
+                    responseData ={
+                    'code' : 400,
+                    'msg' : 'No QnA to show'
+                    }
+                    return JsonResponse(responseData, safe=False)
+
+            except Exception as e:
+                    responseData = {
+                    'code': 500,
+                    'message': 'Something went wrong!!'+str(e),
+                    }
+                    return JsonResponse(responseData, safe=False)
+        else:
+                responseData ={
+                'code' : 400,
+                'msg' : 'Specify Constituency ID'
+                }
+                return JsonResponse(responseData, safe=False)
+   
+                    
+    
+
+                
+

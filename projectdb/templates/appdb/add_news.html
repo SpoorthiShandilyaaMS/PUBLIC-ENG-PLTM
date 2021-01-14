@@ -1,122 +1,167 @@
-<html>
+<!DOCTYPE html>
+{% load static%}
+
 <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <title>addnews</title>
+    <link rel="icon" href="{%static 'img/p.jpg'%}" type="image/x-icon">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+        .sticky {
+
+            position: fixed;
+            top: 0;
+            width: 100%;
+
+        }
+
+        .sticky+.content {
+            padding-top: 102px;
+        }
+    </style>
 </head>
+
+
 <body>
     <div id="viewport">
         {% include "appdb/navbar.html" %}
         <!-- Content -->
         <div id="content" class="container">
             <div class="container-fluid">
-                <form id="addnews">{% csrf_token %}
-                  <div class="row">
-                  <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
-                        <h2 class ='title'><b></p>ADD NEWS FEED</b></h2>
-                    </div>
-                   
-                    <div class="jumbotron">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label>Title</label>
-                                <textarea class="form-control" name="news_title" placeholder="News Title" rows="2" cols="40"></textarea>
+                <form id="addnews" enctype="multipart/form-data">{% csrf_token %}
+                    <div class="row">
+                        <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+
+                            <h2 class='title'><b><span style="color:#1e718a;">ADD </span><span
+                                        style="color:#1e718a;">NEWS </span><span style="color:#1e718a;">FEED</span></b>
+                            </h2>
+                        </div>
+
+                        <div class="jumbotron">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Title</label>
+                                    <textarea class="form-control" name="news_title" placeholder="News Title" rows="2"
+                                        cols="40" style="border:2px double rgb(125, 177, 132)"></textarea>
+                                </div>
+                            </div>
+                            <hr><br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Description</label>
+                                    <textarea class="form-control" name="news_description" placeholder="Description"
+                                        rows="7" cols="60" style="border:2px double rgb(125, 177, 132)"></textarea>
+                                </div>
+                            </div>
+                            <hr><br>
+                            <div class="row">
+                                <div class="file-field">
+                                    <div class="col-md-6">
+                                        <label>Choose file to upload</label>
+                                        <input type="file" id="photo" name="news_image" style=" border:2px double rgb(125, 177,
+                                            132)">
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                            <div class="row">
+                                <center><button type="submit" class="btn btn-success">ADD</button></center>
+                            </div>
+                            <br>
+                            <div id="added" class="alert alert-success alert-dismissible" hidden>
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong id="added_msg"></strong>
                             </div>
                         </div>
-                        <br><br>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label>Description</label>
-                                <textarea class="form-control" name="news_description" placeholder="Description" rows="7" cols="60"></textarea>
-                            </div>
-                        </div>
-                        <br><br>
-                        <div class="row">
-                            <center><button type="submit" class="btn btn-info">ADD</button></center>
-                        </div>
-                        <br>
-                        <div id="added" class="alert alert-success alert-dismissible" hidden>
-                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            <strong id="added_msg"></strong>
-                          </div>
-                    </div>
-                    
-                    
-                    
-                  </form>
-                </div>
+
+
+
+                </form>
             </div>
         </div>
+    </div>
     </div>
     </div>
 
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-     $(".close").click(function(){
-            $("#added").hide()  
-        })
+    // scroll function
+    window.onscroll = function () { myFunction() };
+
+var header = document.getElementById("myHeader");
+var sticky = header.offsetTop; function myFunction() {
+    if (window.pageYOffset > sticky) {
+        header.classList.add("sticky");
+    } else {
+        header.classList.remove("sticky");
+    }
+}
+    $(".close").click(function () {
+        $("#added").hide()
+    })
+    //photoupload
+    var globalPhotoName;
     // on submit of addFeed form
-    $(document).on('submit', '#addnews', function(e) {
-            e.preventDefault();
+    $(document).on('submit', '#addnews', function (e) {
+        e.preventDefault();
 
-            //get form data
-            var form = document.getElementById('addnews');
-            var formData = new FormData(form);
-            formData.append('constituency_name', sessionStorage.getItem('uconsname'));
-            $.ajax({
-                url: "/addFeed",
-                data: formData,
-                cache: false,
-                processData: false,
-                contentType: false,
-                type: 'POST',
-                beforeSend: function() {},
-                success: function(response) {
-                    if (response['code'] == 200) {
-                        document.getElementById("addnews").reset();
+        //get form data
+        var form = document.getElementById('addnews');
+        var formData = new FormData(form);
+        formData.append('constituency_name', sessionStorage.getItem('uconsname'));
+        $.ajax({
+            url: "/addFeed",
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            beforeSend: function () { },
+            success: function (response) {
+                if (response['code'] == 200) {
+                    document.getElementById("addnews").reset();
 
-                        $("#added_msg").html(response['message'])
-                        $("#added").show()                                        
+                    $("#added_msg").html(response['message'])
+                    $("#added").show()
 
-                    } else if (response['code'] == 400) {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: response['message'],
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        })
-                    } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: response['message'],
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        })
-                    }
-
-
-                },
-                error: function(error) {
+                } else if (response['code'] == 400) {
                     Swal.fire({
-                        title: 'oops!',
-                        text: "Something went wrong . Try again!!!",
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
                         icon: 'error',
                         confirmButtonText: 'OK'
                     })
                 }
-            })
-        });
 
-       
+
+            },
+            error: function (error) {
+                Swal.fire({
+                    title: 'oops!',
+                    text: "Something went wrong . Try again!!!",
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                })
+            }
+        })
+    });
+    
 
 </script>
 
 </html>
 
-
-
-
 </body>
-
-
 
 </html>

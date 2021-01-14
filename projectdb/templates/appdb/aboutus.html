@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+{% load static%}
+<html>
+
+<head>
+    <title>Aboutus</title>
+    <link rel="icon" href="{%static 'img/p.jpg'%}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        .mySlides1,
+        .mySlides2 {
+            display: none
+        }
+
+        img {
+            vertical-align: middle;
+        }
+
+        /* Slideshow container
+.slideshow-container {
+  max-width: 1000px;
+  position: relative;
+  margin: auto;
+} */
+
+        /* Next & previous buttons */
+        /* .prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -22px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+} */
+
+        /* Position the "next button" to the right */
+        /* .next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+} */
+
+        /* On hover, add a grey background color */
+        .prev:hover,
+        .next:hover {
+            background-color: #f1f1f1;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+
+    <div class=" container-fluid jumbotron ">
+        <div class="mySlides1">
+            <marquee>
+                <h2 style="font: Garamond, Georgia, serif;color:rgb(114, 111, 107)"><b><i>ABOUT US</i></b></h2>
+            </marquee>
+            <img src="{%static 'img/aboutus.jpeg'%}" style="height: 300px;
+  width: 100%;">
+        </div>
+    </div>
+
+
+
+    <script>
+        var slideIndex = [1, 1];
+        var slideId = ["mySlides1", "mySlides2"]
+        showSlides(1, 0);
+        showSlides(1, 1);
+
+        function plusSlides(n, no) {
+            showSlides(slideIndex[no] += n, no);
+        }
+
+        function showSlides(n, no) {
+            var i;
+            var x = document.getElementsByClassName(slideId[no]);
+            if (n > x.length) { slideIndex[no] = 1 }
+            if (n < 1) { slideIndex[no] = x.length }
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            x[slideIndex[no] - 1].style.display = "block";
+        }
+    </script>
+    <div class=" jumbotron container-fluid bordered">
+        <large><article>
+                The way that politics plays out online is fascinating. Endless polls, endless opinions, rant
+                statuses and little that actually changes in the real world. Political accountability refers to the
+                responsibility or obligation of government officials to act in the best interests of society or face
+                consequences. Public officials should be held responsible for their actions. And
+                Accountability is important in evaluating the on-going effectiveness of public officials or
+                bodies ensures that they are performing to their full potential, providing value for money,
+                instilling confidence in the government and being responsive to the community. Public
+                Engagement Platform is a citizen engagement platform and is our endeavor to promote the
+                active participation of Indian citizens in their country's governance and development. It is also
+                aimed at creating a common platform for citizens (say for a specific constituency) to crowd
+                source governance ideas from citizens also. Using this application user shall be allowed to
+                discuss and to contribute on various government projects and plans. If the people encounter
+                some public issues it also allows users to upload the same and give a brief description about it
+                and thus creating awareness and which will reach the representatives easily.<br><br><br>
+
+            India is the largest democratic country in the world. Democracy is defined as the
+                government of the people, by the people and for the people. And we all know that, isn’t it?
+                So, it is not possible for all the citizens to participate in the government and that is why we
+                select our representatives at regular intervals. But today if we look at it is it really happening?
+                Are we able to communicate with the government? Are all our problems reaching the
+                representatives we select? If no what are real problems we are facing? Not all our problems
+                are reaching the government. Even if they do, the results are null or not satisfactory. And
+                most of the times they are ignored. And the process to file a complaint is quite old and is time
+                consuming.<br>
+                So, we have solution for all these problems. Our web application helps to overcome
+                these problems.<br>
+                The main objective of our application is to connect the citizens to Parliamentarians.
+                The main idea is to build a web application which will provide a common platform for the
+                people belonging to a constituency to create awareness about the different public issues.
+                Public issues can be acknowledged to the representative. Promotes active participation of
+                citizens in governance.<br><br><br>
+
+            Let us consider a constituency. If there is a public issue there is no common platform which is
+                effective in
+                acknowledging it to the representative. And we cannot expect the representatives all the times to make
+                time
+                to listen to each of the problems. Once the problem is addressed, its progression should be intimidated
+                to
+                the public which in many cases could not happen. The process to file a complaint is too sluggish. There
+                are
+                many other citizen engagement platforms. And other similar application is MyGov, a Government funded app
+                is
+                other endeavor. But these websites somewhere fails to address the minute issues of minute constituencies
+                and
+                also fails to involve the local representatives.<br>
+        </article></large>
+        <br>
+        <br>
+    </div>
+
+
+
+    <div class="text-left container">
+        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="36" fill="currentColor"
+            class="bi bi-arrow-left-square" viewBox="0 0 16 16"><a href="home">
+                <path fill-rule="evenodd"
+                    d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" />
+        </svg></a>
+    </div>
+
+    </div>
+</body>
+
+</html>

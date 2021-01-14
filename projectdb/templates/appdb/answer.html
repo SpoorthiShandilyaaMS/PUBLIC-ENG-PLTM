@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+{% load static%}
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <title>Answer</title>
+    <link rel="icon" href="{%static 'img/p.jpg'%}" type="image/x-icon">
+  
+</head>
+
+<body>
+    <div id="viewport">
+        {% include "appdb/navbar.html" %}
+        <div id="content" class="container">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Modal -->
+                    <div class="modal fade" id="answerModal" role="dialog">
+                        <div class="modal-dialog">
+
+                            <!-- Modal content-->
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Answer</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="answerform"> {% csrf_token %}
+                                        <input type="text" id="queryId" hidden>
+
+                                        <div class="form-group">
+                                            <label>Answer</label>
+                                            <textarea class="form-control" name="answer" id="answer_to_query"
+                                                placeholder="write your answer here..." rows="7" cols="60"></textarea>
+
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" id="ansBtn" onclick="answer()"
+                                        class="btn btn-info pull-right">Save
+                                    </button>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+
+                    <h2 class='title'><b><span style="color:#1e718a;">Answer </span></b></h2>
+                </div>
+                <div id="added_queries">
+                    <!-- <div id="query23" class="jumbotron">
+                            <large id="query_id"><b>Q</b></large><br><br>
+                            <div class="btn-group"><button type="button" data-toggle="modal" data-target="#editQueryModal"
+                                    onclick="openAnswer(23)" class="btn btn-success">Answer</button></div>
+                        </div> -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+   
+    $(".close").click(function () {
+        $("#addedcomp").hide()
+    })
+    $(document).ready(function () {
+        getAllQueries(sessionStorage.getItem('const_id'))
+    })
+    // get all queries
+    function getAllQueries(const_id) {
+        $.ajax({
+            url: "/getallqueries?const_id=" + const_id,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'GET',
+            beforeSend: function () { },
+            success: function (response) {
+
+                queryData = response.data;
+                var data = "";
+
+                queryData.forEach(function (query) {
+                    if (query.answered_by) var answeredBy = query.answered_by.split("~");
+                    else var answeredBy = [];
+                    var query_id = query['id'];
+                    var query = query['query'];
+
+                    if (answeredBy.length != 0) {
+                        console.log("answered", query, answeredBy)
+                        if (answeredBy.includes(sessionStorage.getItem('username'))) {
+                            data += '<div id="query' + query_id + '" class="jumbotron">' +
+                                '<large id="querydesc' + query_id + '"<br><b>' + query + '</b></large><br><br>' +
+                                '<div class="btn-group"><button type="button" id="answerBtn' + query_id + '"" data-toggle="modal" data-target="#answerModal" ' +
+                                'onclick="openAnswer(' + query_id + ')" class="btn btn-success" disabled>Answer</button> <small>(Already answered this query)</small></div></div>';
+                        }
+                        else {
+                            console.log("not answered", query, answeredBy)
+                            data += '<div id="query' + query_id + '" class="jumbotron">' +
+                                '<large id="querydesc' + query_id + '"<br><b>' + query + '</b></large><br><br>' +
+                                '<div class="btn-group"><button type="button" id="answerBtn' + query_id + '"" data-toggle="modal" data-target="#answerModal" ' +
+                                'onclick="openAnswer(' + query_id + ')" class="btn btn-success">Answer</button></div></div>';
+                        }
+                    }
+
+                    else {
+                        console.log("nobody answered", query, answeredBy)
+                        data += '<div id="query' + query_id + '" class="jumbotron">' +
+                            '<large id="querydesc' + query_id + '"<br><b>' + query + '</b></large><br><br>' +
+                            '<div class="btn-group"><button type="button" id="answerBtn' + query_id + '"" data-toggle="modal" data-target="#answerModal" ' +
+                            'onclick="openAnswer(' + query_id + ')" class="btn btn-success">Answer</button><small id="ans' + query_id + '"" hidden>(Already answered this query)</small></div></div>';
+                    }
+                });
+                $('#added_queries').html(data);
+                window.scrollBy(100, 0);
+            },
+
+            error: function (error) {
+            }
+        })
+    }
+    //on opening answer modal
+    function openAnswer(id) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        $("#queryId").val(id);
+
+    }
+    function answer() {
+        //get form data
+        console.log($('#queryId').val())
+        var form = document.getElementById('answerform');
+        var formData = new FormData(form);
+        formData.append('query_id', $('#queryId').val());
+        formData.append('answered_by_name', sessionStorage.getItem('username'));
+        $.ajax({
+            url: "/addanswer",
+            cache: false,
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            beforeSend: function () { },
+            success: function (response) {
+                if (response['code'] == 200) {
+                    $('#answerModal').hide();
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                    document.getElementById('answer_to_query').value = null;
+                    $('#answerBtn' + $('#queryId').val()).prop('disabled', true);
+                    document.getElementById("ans" + $('#queryId').val()).removeAttribute("hidden");
+                    Swal.fire({
+                        title: 'Success!',
+                        text: response['message'],
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    })
+
+                } else if (response['code'] == 400) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+            },
+            error: function (error) {
+                Swal.fire({
+                    title: 'oops!',
+                    text: "Something went wrong . Try again!!!",
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                })
+            }
+        })
+    }
+
+
+
+
+
+</script>

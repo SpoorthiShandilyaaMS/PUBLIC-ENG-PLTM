@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+{% load static%}
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script> src = "https://cdn.jsdelivr.net/npm/sweetalert2@10" </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.js"></script>
+    <title>Poll</title>
+    <link rel = "icon" href ="{%static 'img/p.jpg'%}"
+          type = "image/x-icon"> 
+    <style>
+        col-1-4 {
+            width: 25%;
+            float: left;
+            padding: 10px;
+        }
+
+        .post-wrap {
+            padding: 20px;
+        }
+
+        .noupvoted {
+            color: rgb(65, 160, 192);
+        }
+
+        .sticky {
+
+            position: fixed;
+            top: 0;
+            width: 100%;
+
+        }
+
+        .sticky+.content {
+            padding-top: 102px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="viewport">
+        {% include "appdb/navbar.html" %}
+        <div id="content" class="container">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="card well card-body bg-light header" id="myHeader" style="background-color:#eee;">
+                        <h2 class='title'><b><span style="color:#1e718a;">Polling </span></b></h2>
+                    </div>
+
+                    <div id="polls">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+
+
+    $('document').ready(function () {
+        getAllComplaints();
+    });
+
+    //get all complaints function
+    function getAllComplaints() {
+        $.ajax({
+            type: 'GET',
+            cache: false,
+            processData: false,
+            contentType: false,
+            url: "/getallcomplaints?const_id=" + sessionStorage.getItem('const_id'),
+            success: function (response) {
+                if (response['code'] == 200) {
+
+                    complaintData = response['data'];
+
+                    var data = '';
+                    if (complaintData.length != 0) {
+                        complaintData.forEach(function (comp) {
+
+                            var id = comp['id'];
+                            var sector_name = comp['sector_name'];
+                            var posted_by_name = comp['posted_by_name'];
+                            var complaint_subject = comp['complaint_subject'];
+                            var complaint_details = comp['complaint_details'];
+                            var no_up_vote = comp['no_up_vote'];
+                            var image = comp['complaintimage']
+                            console.log(id, sector_name, posted_by_name, complaint_subject, complaint_details, image);
+
+                            data += '<div id="query' + id + '" class="jumbotron">' +
+                                '<label>Sector :<span style="padding-left:10px"></span></label>' + sector_name + '<span style="padding-left:60px"></span>' +
+                                '<label>Posted By :<span style="padding-left:10px"></span> </label>' + posted_by_name + '<br>' +
+                                '<hr>' +
+                                '<p>' + complaint_subject + '<p>' +
+                                '<article>' + complaint_details + '</article><br>' +
+                                '<hr>';
+                            if (image) data += '<div class="content" id="photo"><img src="' + image + '" width="450" height="200"></div><br><hr>';
+                            data += '<button id="#btnpoll' + id + '" onclick="upvote(' + id + ')" type="submit" class="btn btn-success btn-sm glyphicon glyphicon-thumbs-up"> Upvote</button><br><br>' +
+                                '<label>No. Of Upvotes: </label><span style="padding-left:10px"></span><b class="noupvoted" id="#noupvoted' + id + '">' + no_up_vote + '</b>' +
+                                '</div>';
+
+                        })
+                        $('#polls').html(data);
+                    }
+                    else $('#polls').html("No Complaints Registered Yet...");
+
+                }
+
+            },
+            error: function (error) {
+
+            },
+        });
+    }
+
+    //upvote function
+    function upvote(id) {
+        var formData = new FormData();
+        formData.append('complaint_id', id);
+        formData.append('user_name', sessionStorage.getItem('username'));
+        $.ajax({
+            url: "/upvote",
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            beforeSend: function () { },
+            success: function (response) {
+                if (response['code'] == 200) {
+
+                    Swal.fire({
+                        // title: 'Success!',
+                        text: response['message'],
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    })
+                    document.getElementById('#noupvoted' + id).innerHTML = response['no_up_vote'];
+                }
+                else if (response['code'] == 201) {
+                    Swal.fire({
+                        title: response['message'],
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
+                    })
+                }
+                else if (response['code'] == 400) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response['message'],
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+            },
+            error: function (error) {
+                Swal.fire({
+                    title: 'oops!',
+                    text: "Something went wrong . Try again!!!",
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                })
+            }
+        })
+    }
+   
+</script>
