@@ -1,2 +1,3 @@
 # PUBLIC-ENG-PLTM
 DBPROJECT
+Public Engagement platform   is a citizen engagement platform and is our endeavour to promote the active participation of Indian citizens in their country's governance and development. It is also aimed at creating a common platform for citizens (say for a specific constituency) to crowd source governance ideas from citizens also. Using this application user shall be allowed to discuss and to contribute on various government projects and plans. If the people encounter some public issues it also allows users to upload photos of the same and give a brief description about it and thus creating awareness. 
